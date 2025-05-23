@@ -2,328 +2,264 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Stress Manager – Health Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Emotional Wellness Tracker</title>
+  <link rel="manifest" href="manifest.json">
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      background: #f5f6fa; 
-      margin: 0; padding: 0;
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      background: #f5f5f5;
+      color: #222;
     }
-    .container { 
-      max-width: 650px; 
-      margin: 30px auto; 
-      background: #fff; 
-      border-radius: 12px; 
-      box-shadow: 0 2px 12px #bbb; 
-      padding: 28px 24px 18px 24px;
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 1em;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    h2 { color: #0066cc; margin-top: 0; }
-    h3 { margin-bottom: 10px; }
-    .section { margin-bottom: 28px; }
-    .tags { display: flex; gap: 8px; flex-wrap: wrap; }
-    .tag { 
-      padding: 8px 16px; 
-      background: #eee; 
-      border-radius: 18px; 
-      cursor: pointer; 
-      transition: background 0.2s, color 0.2s;
-      font-size: 1em;
-      user-select: none;
-      border: 1.5px solid #ddd;
+    h1, h2 {
+      text-align: center;
+      font-weight: 600;
     }
-    .tag.selected { 
-      background: #8ecae6; 
-      color: #05445e; 
-      border: 1.5px solid #2196f3;
-    }
-    .faces, .hearts { 
-      display: flex; 
-      gap: 16px; 
-      justify-content: center; 
-      margin: 14px 0; 
-    }
-    .face, .heart { 
-      font-size: 2.1em; 
-      cursor: pointer; 
-      transition: transform 0.12s;
-      filter: grayscale(0.2);
-      user-select: none;
-    }
-    .face.selected, .heart.selected { 
-      transform: scale(1.22); 
-      filter: drop-shadow(0 0 4px #2196f3);
-    }
-    .hearts .heart { color: #e63946; }
-    .input-group { margin-bottom: 13px; }
-    label { font-weight: 600; }
-    textarea, input[type="text"], input[type="number"] {
-      width: 100%; 
-      border-radius: 7px; 
-      border: 1px solid #bbb; 
-      padding: 8px;
-      font-size: 1em;
-      margin-top: 2px;
-    }
-    textarea { height: 58px; resize: vertical; }
-    .stats, .track-options { 
-      background: #f1f7fa; 
-      border-radius: 8px; 
-      padding: 12px; 
-      margin-top: 18px;
-    }
-    .stats h4 { margin-top: 0; }
-    .stat-item { margin-bottom: 7px; font-weight: 500;}
-    .btn { 
-      background: #2196f3; 
-      color: #fff; 
-      padding: 10px 22px; 
-      border: none; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      font-size: 1.1em;
-      margin-top: 6px;
-    }
-    .btn:hover { background: #0066cc; }
-    #emotion-wheel-container {
+    .emotion-wheel {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 1em 0;
     }
-    #emotion-wheel {
-      margin-bottom: 10px;
-    }
-    #emotion-wheel text {
-      pointer-events: none;
-      font-family: Arial, sans-serif;
+    .emotion-btn {
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin: 0.5em;
+      color: #fff;
+      font-size: 1em;
       font-weight: bold;
-      user-select: none;
-      font-size: 15px;
+      cursor: pointer;
+      outline: none;
+      transition: transform 0.1s;
     }
-    #selected-emotion {
+    .emotion-btn.selected {
+      border: 3px solid #444;
+      transform: scale(1.15);
+    }
+    .add-emotion {
+      display: flex;
+      justify-content: center;
+      margin: 1em 0;
+      gap: 0.5em;
+      flex-wrap: wrap;
+    }
+    .add-emotion input, .add-emotion button {
+      font-size: 1em;
+      padding: 0.3em 0.6em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .add-emotion button {
+      background: #0077cc;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    #saveEmotion {
+      display: block;
+      width: 100%;
+      margin: 1em 0;
+      padding: 0.75em;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
       font-size: 1.1em;
-      color: #0066cc;
-      min-height: 22px;
-      margin-top: 6px;
+      font-weight: bold;
+      cursor: pointer;
     }
-    @media (max-width: 720px) {
-      .container { max-width: 99vw; padding: 8vw 2vw; }
-      #emotion-wheel { width: 90vw; height: 90vw; max-width: 340px; max-height: 340px;}
+    #emotionBarChart {
+      background: #fff;
+      border-radius: 8px;
+      margin: 1em 0;
+      width: 100% !important;
+      height: 300px !important;
+    }
+    @media (max-width: 600px) {
+      .container { max-width: 100%; border-radius: 0; }
+      .emotion-btn { width: 40px; height: 40px; font-size: 0.9em; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Log Your Current Health Status</h2>
+    <h1>Emotional Wellness Tracker</h1>
+    <h2>How are you feeling today?</h2>
+    <div class="emotion-wheel" id="emotionWheel"></div>
 
-    <!-- 1. What's going on now? -->
-    <div class="section">
-      <h3>1. What's going on now?</h3>
-      <div class="tags" id="activity-tags">
-        <div class="tag">Sleep</div>
-        <div class="tag">Workout</div>
-        <div class="tag">Meal</div>
-        <div class="tag">Work</div>
-        <div class="tag">Headache</div>
-        <div class="tag">Stressed</div>
-        <div class="tag">Relaxing</div>
-        <div class="tag">Social</div>
-        <div class="tag">Other</div>
-      </div>
+    <div class="add-emotion">
+      <input type="text" id="newEmotionName" placeholder="New emotion (e.g. Grateful)">
+      <input type="color" id="newEmotionColor" value="#888888">
+      <button onclick="addEmotion()">Add Emotion</button>
     </div>
+    
+    <button id="saveEmotion" disabled>Save Emotion</button>
+    
+    <canvas id="emotionBarChart"></canvas>
 
-    <!-- 2. How's your mood? -->
-    <div class="section">
-      <h3>2. How's your mood?</h3>
-      <div id="emotion-wheel-container">
-        <svg id="emotion-wheel" width="320" height="320" viewBox="0 0 320 320">
-          <!-- Sectors and labels are rendered by JS -->
-        </svg>
-        <div id="selected-emotion"></div>
-        <em style="font-size: 0.95em; color:#333;">Tap a segment to select your primary emotion</em>
-      </div>
-      <div class="faces" id="mood-faces" aria-label="Mood faces">
-        <span class="face" title="Very sad" role="img">&#128577;</span>
-        <span class="face" title="Sad" role="img">&#128542;</span>
-        <span class="face" title="Neutral" role="img">&#128528;</span>
-        <span class="face" title="Happy" role="img">&#128522;</span>
-        <span class="face" title="Very happy" role="img">&#128515;</span>
-      </div>
-    </div>
-
-    <!-- 3. How are you physically? -->
-    <div class="section">
-      <h3>3. How are you physically?</h3>
-      <div class="hearts" id="physical-hearts" aria-label="Physical condition hearts">
-        <span class="heart" title="Poor" role="img">&#10084;&#65039;</span>
-        <span class="heart" title="Fair" role="img">&#10084;&#65039;</span>
-        <span class="heart" title="Average" role="img">&#10084;&#65039;</span>
-        <span class="heart" title="Good" role="img">&#10084;&#65039;</span>
-        <span class="heart" title="Excellent" role="img">&#10084;&#65039;</span>
-      </div>
-    </div>
-
-    <!-- 4. Track blood pressure, weight, and thoughts -->
-    <div class="section track-options">
-      <div class="input-group">
-        <label for="bp">Blood Pressure:</label>
-        <input id="bp" type="text" placeholder="e.g., 120/80">
-      </div>
-      <div class="input-group">
-        <label for="weight">Weight (kg):</label>
-        <input id="weight" type="number" step="0.1" placeholder="e.g., 70.5">
-      </div>
-      <div class="input-group">
-        <label for="thoughts">Thoughts or Reflections:</label>
-        <textarea id="thoughts" placeholder="Add any thoughts or notes..."></textarea>
-      </div>
-      <button class="btn" id="log-entry">Log Entry</button>
-    </div>
-
-    <!-- 5. User statistics display -->
-    <div class="stats" id="user-stats">
-      <h4>Your Statistics</h4>
-      <div class="stat-item">Average Mood: <span id="stat-mood">🙂</span></div>
-      <div class="stat-item">Physical Condition: <span id="stat-physical">Good</span></div>
-      <div class="stat-item">Blood Pressure: <span id="stat-bp">120/80</span></div>
-      <div class="stat-item">Weight: <span id="stat-weight">70.5 kg</span></div>
-    </div>
+    <h2>My Entries</h2>
+    <ul id="emotionList"></ul>
   </div>
-  <!-- SCRIPTS -->
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // Tag selection
-    document.querySelectorAll('.tag').forEach(tag => {
-      tag.addEventListener('click', function() {
-        this.classList.toggle('selected');
-      });
-    });
-
-    // Face (mood) selection
-    document.querySelectorAll('.face').forEach((face, idx, arr) => {
-      face.addEventListener('click', function() {
-        arr.forEach(f => f.classList.remove('selected'));
-        this.classList.add('selected');
-      });
-    });
-
-    // Heart (physical) selection
-    document.querySelectorAll('.heart').forEach((heart, idx, arr) => {
-      heart.addEventListener('click', function() {
-        arr.forEach(h => h.classList.remove('selected'));
-        for (let i = 0; i <= idx; i++) arr[i].classList.add('selected');
-      });
-    });
-
-    // Plutchik's Emotion Wheel
-    const emotions = [
-      { name: "Joy", color: "#FFE066" },
-      { name: "Trust", color: "#8BC34A" },
-      { name: "Fear", color: "#00BCD4" },
-      { name: "Surprise", color: "#448AFF" },
-      { name: "Sadness", color: "#90A4AE" },
-      { name: "Disgust", color: "#9C27B0" },
-      { name: "Anger", color: "#FF7043" },
-      { name: "Anticipation", color: "#FFEE58" }
+    // --- Emotions Data: Default + Load from localStorage ---
+    const defaultEmotions = [
+      { name: 'Happy', color: '#FFD700' },
+      { name: 'Sad', color: '#1E90FF' },
+      { name: 'Angry', color: '#FF6347' },
+      { name: 'Calm', color: '#32CD32' },
+      { name: 'Anxious', color: '#FFB347' },
+      { name: 'Excited', color: '#E67E22' },
+      { name: 'Tired', color: '#A9A9A9' },
+      { name: 'Surprised', color: '#8e44ad' }
     ];
 
-    function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-      const angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-      return {
-        x: centerX + (radius * Math.cos(angleInRadians)),
-        y: centerY + (radius * Math.sin(angleInRadians))
-      };
+    function loadEmotions() {
+      return JSON.parse(localStorage.getItem('emotionsList')) || defaultEmotions;
+    }
+    function saveEmotions(emotions) {
+      localStorage.setItem('emotionsList', JSON.stringify(emotions));
     }
 
-    function describeArc(x, y, radius, startAngle, endAngle){
-      const start = polarToCartesian(x, y, radius, endAngle);
-      const end = polarToCartesian(x, y, radius, startAngle);
-      const arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
-      const d = [
-        "M", x, y,
-        "L", start.x, start.y, 
-        "A", radius, radius, 0, arcSweep, 0, end.x, end.y,
-        "Z"
-      ].join(" ");
-      return d;       
+    // --- Render Emotion Wheel ---
+    function renderEmotionWheel(selected) {
+      const emotions = loadEmotions();
+      const wheel = document.getElementById('emotionWheel');
+      wheel.innerHTML = '';
+      emotions.forEach(e => {
+        const btn = document.createElement('button');
+        btn.className = 'emotion-btn';
+        btn.style.background = e.color;
+        btn.textContent = e.name;
+        btn.onclick = () => selectEmotion(e.name);
+        if (selected === e.name) btn.classList.add('selected');
+        wheel.appendChild(btn);
+      });
     }
 
-    function drawEmotionWheel() {
-      const svg = document.getElementById('emotion-wheel');
-      svg.innerHTML = '';
-      const center = 160, radius = 135;
-      const angleStep = 360 / emotions.length;
-      for (let i = 0; i < emotions.length; i++) {
-        const startAngle = i * angleStep;
-        const endAngle = startAngle + angleStep;
-        const emotion = emotions[i];
-
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", describeArc(center, center, radius, startAngle, endAngle));
-        path.setAttribute("fill", emotion.color);
-        path.setAttribute("stroke", "#fff");
-        path.setAttribute("stroke-width", "2");
-        path.setAttribute("data-emotion", emotion.name);
-        path.style.cursor = "pointer";
-        path.addEventListener("click", onSectorClick);
-        svg.appendChild(path);
-
-        // Add emotion label
-        const labelAngle = startAngle + angleStep/2;
-        const labelPos = polarToCartesian(center, center, radius * 0.75, labelAngle);
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", labelPos.x);
-        text.setAttribute("y", labelPos.y);
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("dominant-baseline", "middle");
-        text.setAttribute("font-size", "15");
-        text.setAttribute("fill", "#222");
-        text.textContent = emotion.name;
-        svg.appendChild(text);
+    // --- Add New Emotion ---
+    function addEmotion() {
+      const nameInput = document.getElementById('newEmotionName');
+      const colorInput = document.getElementById('newEmotionColor');
+      const name = nameInput.value.trim();
+      const color = colorInput.value;
+      if (!name) { alert('Enter an emotion name.'); return; }
+      let emotions = loadEmotions();
+      if (emotions.some(e => e.name.toLowerCase() === name.toLowerCase())) {
+        alert('Emotion already exists.');
+        return;
       }
+      emotions.push({ name, color });
+      saveEmotions(emotions);
+      renderEmotionWheel();
+      nameInput.value = '';
+      colorInput.value = '#888888';
     }
 
-    function onSectorClick(evt) {
-      // Remove highlight from previous selections
-      document.querySelectorAll('#emotion-wheel path').forEach(p => p.setAttribute("stroke-width", "2"));
-      // Highlight selected
-      evt.target.setAttribute("stroke-width", "6");
-      const emotion = evt.target.getAttribute("data-emotion");
-      document.getElementById('selected-emotion').textContent = "Selected: " + emotion;
-      document.getElementById('selected-emotion').setAttribute("data-selected", emotion);
+    // --- Emotion Selection ---
+    let selectedEmotion = null;
+    function selectEmotion(name) {
+      selectedEmotion = name;
+      renderEmotionWheel(selectedEmotion);
+      document.getElementById('saveEmotion').disabled = false;
     }
-    drawEmotionWheel();
 
-    // Logging and statistics (simple demo)
-    function getMoodSymbol(idx) {
-      // Index: 0 = very sad, ..., 4 = very happy
-      return ["😢","🙁","😐","🙂","😃"][idx];
+    // --- Save Emotion Entry ---
+    document.getElementById('saveEmotion').onclick = function() {
+      if (!selectedEmotion) return;
+      const today = new Date().toISOString().split('T')[0];
+      const entry = { date: today, emotion: selectedEmotion };
+      let emotions = JSON.parse(localStorage.getItem('emotions')) || [];
+      emotions.push(entry);
+      localStorage.setItem('emotions', JSON.stringify(emotions));
+      renderEntries();
+      renderBarChart();
+      document.getElementById('saveEmotion').disabled = true;
+      selectedEmotion = null;
+      renderEmotionWheel();
+    };
+
+    // --- Get Emotion Color ---
+    function getEmotionColor(emotion) {
+      const emotions = loadEmotions();
+      const found = emotions.find(e => e.name === emotion);
+      return found ? found.color : '#888';
     }
-    function getPhysicalLabel(idx) {
-      return ["Poor","Fair","Average","Good","Excellent"][idx];
+
+    // --- Prepare Chart Data ---
+    function getEmotionData() {
+      const emotions = JSON.parse(localStorage.getItem('emotions')) || [];
+      // Group by date and count each emotion
+      const emotionCounts = {};
+      emotions.forEach(entry => {
+        if (!emotionCounts[entry.date]) emotionCounts[entry.date] = {};
+        if (!emotionCounts[entry.date][entry.emotion]) emotionCounts[entry.date][entry.emotion] = 0;
+        emotionCounts[entry.date][entry.emotion]++;
+      });
+      // Prepare labels (dates) and datasets (emotions)
+      const dates = Object.keys(emotionCounts).sort();
+      const allEmotions = loadEmotions().map(e => e.name);
+      const datasets = allEmotions.map(emotion => ({
+        label: emotion,
+        backgroundColor: getEmotionColor(emotion),
+        data: dates.map(date => emotionCounts[date][emotion] || 0)
+      }));
+      return { dates, datasets };
     }
-    document.getElementById('log-entry').addEventListener('click', function() {
-      // Collect selections
-      let tags = [];
-      document.querySelectorAll('.tag.selected').forEach(tag => tags.push(tag.textContent));
-      let moodIdx = Array.from(document.querySelectorAll('.face')).findIndex(f => f.classList.contains('selected'));
-      let physicalIdx = Array.from(document.querySelectorAll('.heart')).filter(h => h.classList.contains('selected')).length - 1;
-      let bp = document.getElementById('bp').value || "—";
-      let weight = document.getElementById('weight').value || "—";
-      let thoughts = document.getElementById('thoughts').value || "";
 
-      // Update statistics
-      if(moodIdx>=0) document.getElementById('stat-mood').textContent = getMoodSymbol(moodIdx);
-      if(physicalIdx>=0) document.getElementById('stat-physical').textContent = getPhysicalLabel(physicalIdx);
-      document.getElementById('stat-bp').textContent = bp;
-      document.getElementById('stat-weight').textContent = weight==="—"? "—": (weight + " kg");
+    // --- Render Bar Chart ---
+    let emotionChart = null;
+    function renderBarChart() {
+      const ctx = document.getElementById('emotionBarChart').getContext('2d');
+      const { dates, datasets } = getEmotionData();
+      if (emotionChart) emotionChart.destroy();
+      emotionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: dates,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: 'Emotions Over Time' }
+          },
+          scales: {
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true }
+          }
+        }
+      });
+    }
 
-      // Optionally display a toast or confirmation
-      this.textContent = "Logged!";
-      setTimeout(()=>this.textContent="Log Entry",1000);
+    // --- Render Entries List ---
+    function renderEntries() {
+      const emotions = JSON.parse(localStorage.getItem('emotions')) || [];
+      const ul = document.getElementById('emotionList');
+      ul.innerHTML = emotions.slice().reverse().map(e => 
+        `<li><strong>${e.date}:</strong> <span style="color:${getEmotionColor(e.emotion)}">${e.emotion}</span></li>`
+      ).join('');
+    }
 
-      // Clear thoughts
-      document.getElementById('thoughts').value = "";
-    });
+    // --- Initial Load ---
+    window.onload = function() {
+      renderEmotionWheel();
+      renderEntries();
+      renderBarChart();
+    };
   </script>
 </body>
 </html>
