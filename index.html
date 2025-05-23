@@ -147,6 +147,7 @@
   <textarea id="reflection" name="reflection" rows="4" cols="50" placeholder="Write your thoughts or reflections here..."></textarea>
 </div>
 
+    
     <h2>My Entries</h2>
     <ul id="emotionList"></ul>
   </div>
@@ -159,7 +160,8 @@
         this.classList.toggle('selected');
       });
     });
-
+  </script>
+   <script>
     // ------- Face (mood) selection -------
     document.querySelectorAll('.face').forEach((face, idx, arr) => {
       face.addEventListener('click', function() {
@@ -167,7 +169,8 @@
         this.classList.add('selected');
       });
     });
-
+  </script>
+  <script>
     // ------- Heart (physical) selection -------
     document.querySelectorAll('.heart').forEach((heart, idx, arr) => {
       heart.addEventListener('click', function() {
@@ -175,7 +178,8 @@
         for (let i = 0; i <= idx; i++) arr[i].classList.add('selected');
       });
     });
-
+  </script>
+  <script>
     // ------- Emotions Data (default + localStorage) -------
     const defaultEmotions = [
       { name: 'Happy', color: '#FFD700' },
@@ -194,7 +198,8 @@
     function saveEmotions(emotions) {
       localStorage.setItem('emotionsList', JSON.stringify(emotions));
     }
-
+  </script>
+  <script>
     // ------- Add New Emotion -------
     function addEmotion() {
       const nameInput = document.getElementById('newEmotionName');
@@ -213,7 +218,9 @@
       nameInput.value = '';
       colorInput.value = '#888888';
     }
-
+ </script>
+ 
+  <script>
     // ------- Emotion Wheel SVG -------
     const svgEmotions = [
       { name: "Joy", color: "#FFE066" },
@@ -264,7 +271,8 @@
         path.style.cursor = "pointer";
         path.addEventListener("click", onSectorClick);
         svg.appendChild(path);
-
+  </script>
+    <script>
         // Add emotion label
         const labelAngle = startAngle + angleStep/2;
         const labelPos = polarToCartesian(center, center, radius * 0.75, labelAngle);
@@ -289,7 +297,8 @@
       selectedEmotion = emotion;
       document.getElementById('saveEmotion').disabled = false;
     }
-
+  </script>
+    <script>
     // ------- Save Emotion Entry -------
     document.getElementById('saveEmotion').onclick = function() {
       if (!selectedEmotion) return;
@@ -305,14 +314,16 @@
       document.getElementById('selected-emotion').textContent = '';
       drawEmotionWheel();
     };
-
+  </script>
+    <script>
     // ------- Get Emotion Color -------
     function getEmotionColor(emotion) {
       const emotions = loadEmotions().concat(svgEmotions);
       const found = emotions.find(e => e.name === emotion);
       return found ? found.color : '#888';
     }
-
+  </script>
+    <script>
     // ------- User statistics and log entry -------
     function getMoodSymbol(idx) {
       return ["😢","🙁","😐","🙂","😃"][idx];
@@ -338,7 +349,8 @@
       setTimeout(()=>this.textContent="Log Entry",1000);
       document.getElementById('thoughts').value = "";
     });
-
+  </script>
+    <script>
     // ------- Chart Data -------
     function getEmotionData() {
       const emotions = JSON.parse(localStorage.getItem('emotions')) || [];
@@ -379,7 +391,8 @@
         }
       });
     }
-
+  </script>
+    <script>
     // ------- Render Entries List -------
     function renderEntries() {
       const emotions = JSON.parse(localStorage.getItem('emotions')) || [];
@@ -388,7 +401,8 @@
         `<li><strong>${e.date}:</strong> <span style="color:${getEmotionColor(e.emotion)}">${e.emotion}</span></li>`
       ).join('');
     }
-
+  </script>
+    <script>
     // ------- Initial Load -------
     window.onload = function() {
       drawEmotionWheel();
