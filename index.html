@@ -5,81 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Emotional Wellness Tracker</title>
   <link rel="manifest" href="manifest.json">
-  <!-- For production, move CSS to external file -->
   <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      background: #f5f5f5;
-      color: #222;
-      transition: background 0.3s, color 0.3s;
-    }
-    body.dark-mode {
-      background: #181a1b;
-      color: #f1f1f1;
-    }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 1em;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      transition: background 0.3s;
-    }
-    body.dark-mode .container {
-      background: #232426;
-    }
-    h1, h2, h3 { text-align: center; font-weight: 600; }
-    h2 { color: #0066cc; margin-top: 0; }
-    h3 { margin-bottom: 10px; }
-    .section { margin-bottom: 28px; }
-    .tags { display: flex; gap: 8px; flex-wrap: wrap; }
-    .tag { padding: 8px 16px; background: #eee; border-radius: 18px; cursor: pointer; transition: background 0.2s, color 0.2s; font-size: 1em; user-select: none; border: 1.5px solid #ddd; }
-    .tag.selected { background: #8ecae6; color: #05445e; border: 1.5px solid #2196f3; }
-    body.dark-mode .tag { background: #333; border-color: #444; color: #eee; }
-    .faces, .hearts { display: flex; gap: 16px; justify-content: center; margin: 14px 0; }
-    .face, .heart { font-size: 2.1em; cursor: pointer; transition: transform 0.12s; filter: grayscale(0.2); user-select: none; }
-    .face.selected, .heart.selected { transform: scale(1.22); filter: drop-shadow(0 0 4px #2196f3); }
-    .hearts .heart { color: #e63946; }
-    .input-group { margin-bottom: 13px; }
-    label { font-weight: 600; }
-    textarea, input[type="text"], input[type="number"] {
-      width: 100%; border-radius: 7px; border: 1px solid #bbb; padding: 8px; font-size: 1em; margin-top: 2px; background: #fff; color: #222;
-    }
-    body.dark-mode textarea, body.dark-mode input[type="text"], body.dark-mode input[type="number"] {
-      background: #232426; color: #f1f1f1; border-color: #444;
-    }
-    textarea { height: 58px; resize: vertical; }
-    .stats, .track-options { background: #f1f7fa; border-radius: 8px; padding: 12px; margin-top: 18px; }
-    body.dark-mode .stats, body.dark-mode .track-options { background: #232426; }
-    .stats h4 { margin-top: 0; }
-    .stat-item { margin-bottom: 7px; font-weight: 500;}
-    .btn, .btn-secondary { background: #2196f3; color: #fff; padding: 10px 22px; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em; margin-top: 6px; }
-    .btn:hover, .btn-secondary:hover { background: #0066cc; }
-    .btn-secondary { background: #444; margin-left: .5em; }
-    #emotion-wheel-container { display: flex; flex-direction: column; align-items: center; }
-    #emotion-wheel { margin-bottom: 10px; }
-    #emotion-wheel text { pointer-events: none; font-family: Arial, sans-serif; font-weight: bold; user-select: none; font-size: 15px; }
-    #selected-emotion { font-size: 1.1em; color: #0066cc; min-height: 22px; margin-top: 6px; }
-    .add-emotion, .add-tag { display: flex; justify-content: center; margin: 1em 0; gap: 0.5em; flex-wrap: wrap; }
-    .add-emotion input, .add-emotion button, .add-tag input, .add-tag button { font-size: 1em; padding: 0.3em 0.6em; border-radius: 6px; border: 1px solid #ccc; }
-    .add-emotion button, .add-tag button { background: #0077cc; color: #fff; border: none; cursor: pointer; }
-    #saveEmotion { display: block; width: 100%; margin: 1em 0; padding: 0.75em; background: #28a745; color: #fff; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; }
-    #emotionBarChart { background: #fff; border-radius: 8px; margin: 1em 0; width: 100% !important; height: 300px !important; }
-    body.dark-mode #emotionBarChart { background: #232426; }
-    .export-import { display: flex; justify-content: center; gap: 1em; margin: 1em 0; }
-    .error-msg { color: #b00020; font-size: 0.97em; text-align: center; margin-top: 0.5em; }
-    .dark-toggle { position: fixed; top: 14px; right: 18px; z-index: 2; }
-    @media (max-width: 600px) {
-      .container { max-width: 100%; border-radius: 0; }
-      .face, .heart { font-size: 1.3em; }
-    }
-    @media (max-width: 720px) {
-      .container { max-width: 99vw; padding: 8vw 2vw; }
-      #emotion-wheel { width: 90vw; height: 90vw; max-width: 340px; max-height: 340px;}
-    }
-  </style>
+  <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
   <button class="dark-toggle btn-secondary" aria-pressed="false" aria-label="Toggle dark mode" id="darkToggle">🌙</button>
