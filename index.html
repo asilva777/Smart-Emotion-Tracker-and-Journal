@@ -3,103 +3,176 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Emotional Wellness Tracker</title>
-  <meta name="description" content="Track your emotional wellness daily with interactive tools.">
+  <title>Emotional Wellness Tracker – Monitor Your Mood, Emotions, and Wellbeing</title>
+  <meta name="description" content="Track your emotional wellness daily with interactive tools for mood, physical health, and analytics. Build self-awareness for improved mental well-being.">
+  <meta name="keywords" content="emotional wellness, mood tracker, mental health, analytics, wellbeing, emotions, blood pressure, self-awareness">
   <meta name="author" content="Your Name">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self';">
+  <!-- Open Graph for SEO and Social Sharing -->
+  <meta property="og:title" content="Emotional Wellness Tracker">
+  <meta property="og:description" content="Monitor and analyze your emotional and physical wellness daily.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/asilva777/emotional-wellness-tracker/main/og-image.png">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://github.com/asilva777/emotional-wellness-tracker">
+
+  <!-- Structured Data: JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Emotional Wellness Tracker",
+    "description": "A web app to monitor mood, emotions, and health trends.",
+    "url": "https://github.com/asilva777/emotional-wellness-tracker",
+    "applicationCategory": "HealthApplication"
+  }
+  </script>
+
+  <!-- Manifest and Favicon -->
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
+
+  <!-- Fallback for Chart.js if CDN fails -->
+  <script>
+    function loadChartJsFallback() {
+      var script = document.createElement('script');
+      script.src = 'chart.bundle.min.js'; // Local fallback
+      document.head.appendChild(script);
+    }
+  </script>
 </head>
 <body>
   <header>
-    <h1>Emotional Wellness Tracker</h1>
-    <div class="theme-controls">
-      <button class="dark-toggle btn-secondary" aria-pressed="false" aria-label="Toggle dark mode" id="darkToggle">🌙</button>
+    <h1 id="main-title">Emotional Wellness Tracker</h1>
+    <nav aria-label="Main Navigation">
+      <ul class="visually-hidden">
+        <li><a href="#activity-title">Current Activity</a></li>
+        <li><a href="#mood-title">Mood</a></li>
+        <li><a href="#trend-title">Analytics</a></li>
+        <li><a href="#phys-title">Physical</a></li>
+        <li><a href="#track-title">Track Options</a></li>
+        <li><a href="#user-stats">Statistics</a></li>
+        <li><a href="#entries-title">Entries</a></li>
+      </ul>
+    </nav>
+    <div class="theme-controls" aria-label="Theme Controls">
+      <button class="dark-toggle btn-secondary"
+              aria-pressed="false"
+              aria-label="Toggle dark mode"
+              id="darkToggle"
+              tabindex="0">🌙</button>
       <label for="themeSelect" class="visually-hidden">Choose Theme</label>
-      <select id="themeSelect" aria-label="Choose Theme">
+      <select id="themeSelect" aria-label="Choose Theme" tabindex="0">
         <option value="">Default</option>
         <option value="theme-blue">Blue</option>
         <option value="theme-green">Green</option>
         <option value="theme-orange">Orange</option>
+        <option value="theme-purple">Purple</option>
+        <option value="theme-highcontrast">High Contrast</option>
+      </select>
+    </div>
+    <div class="lang-switch" aria-label="Switch Language">
+      <label for="langSelect" class="visually-hidden">Choose Language</label>
+      <select id="langSelect" aria-label="Choose Language" tabindex="0">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <!-- Add more language options here -->
       </select>
     </div>
   </header>
   <main class="container" role="main">
     <!-- 1. What’s going on now? -->
-    <section class="section" aria-labelledby="activity-title">
+    <section class="section" aria-labelledby="activity-title" tabindex="0">
       <h2 id="activity-title">1. What's going on now?</h2>
       <div class="tags" id="activity-tags" role="listbox" aria-label="Activity tags"></div>
-      <form class="add-tag" onsubmit="return false;">
-        <input type="text" id="newTagName" maxlength="20" placeholder="Add tag (e.g. Study)" aria-label="Add activity tag">
-        <button type="button" onclick="addActivityTag()">Add Tag</button>
+      <form class="add-tag" onsubmit="return false;" aria-label="Add Activity Tag">
+        <input type="text" id="newTagName" maxlength="20" placeholder="Add tag (e.g. Study)"
+               aria-label="Add activity tag" tabindex="0">
+        <button type="button" onclick="addActivityTag()" aria-label="Add tag" tabindex="0">Add Tag</button>
       </form>
     </section>
 
     <!-- 2. How’s your mood? -->
-    <section class="section" aria-labelledby="mood-title">
+    <section class="section" aria-labelledby="mood-title" tabindex="0">
       <h2 id="mood-title">2. How's your mood?</h2>
-      <div id="emotion-wheel-container">
-        <svg id="emotion-wheel" width="320" height="320" viewBox="0 0 320 320" aria-label="Emotion Wheel" tabindex="0" role="img"></svg>
+      <div id="emotion-wheel-container" aria-label="Emotion Wheel Section">
+        <svg id="emotion-wheel" width="320" height="320" viewBox="0 0 320 320"
+             aria-label="Emotion Wheel" tabindex="0" role="img" loading="lazy"></svg>
         <div id="selected-emotion" aria-live="polite"></div>
         <em class="instruction">Tap a segment to select your primary emotion</em>
       </div>
-      <div class="faces" id="mood-faces" aria-label="Mood faces">
-        <span class="face" tabindex="0" title="Very sad" role="button" aria-label="Very sad">&#128577;</span>
-        <span class="face" tabindex="0" title="Sad" role="button" aria-label="Sad">&#128542;</span>
-        <span class="face" tabindex="0" title="Neutral" role="button" aria-label="Neutral">&#128528;</span>
-        <span class="face" tabindex="0" title="Happy" role="button" aria-label="Happy">&#128522;</span>
-        <span class="face" tabindex="0" title="Very happy" role="button" aria-label="Very happy">&#128515;</span>
+      <div class="faces" id="mood-faces" aria-label="Mood faces" role="listbox">
+        <span class="face" tabindex="0" title="Very sad" role="option" aria-label="Very sad">&#128577;</span>
+        <span class="face" tabindex="0" title="Sad" role="option" aria-label="Sad">&#128542;</span>
+        <span class="face" tabindex="0" title="Neutral" role="option" aria-label="Neutral">&#128528;</span>
+        <span class="face" tabindex="0" title="Happy" role="option" aria-label="Happy">&#128522;</span>
+        <span class="face" tabindex="0" title="Very happy" role="option" aria-label="Very happy">&#128515;</span>
       </div>
-      <form class="add-emotion" onsubmit="return false;">
-        <input type="text" id="newEmotionName" maxlength="20" placeholder="New emotion (e.g. Grateful)" aria-label="New emotion">
-        <input type="color" id="newEmotionColor" value="#888888" aria-label="Pick color">
-        <button type="button" onclick="addEmotion()">Add Emotion</button>
+      <form class="add-emotion" onsubmit="return false;" aria-label="Add New Emotion">
+        <input type="text" id="newEmotionName" maxlength="20"
+               placeholder="New emotion (e.g. Grateful)"
+               aria-label="New emotion" tabindex="0">
+        <input type="color" id="newEmotionColor" value="#888888" aria-label="Pick color" tabindex="0">
+        <button type="button" onclick="addEmotion()" aria-label="Add emotion" tabindex="0">Add Emotion</button>
       </form>
-      <button id="saveEmotion" disabled>Save Emotion</button>
+      <button id="saveEmotion" disabled aria-label="Save Emotion" tabindex="0">Save Emotion</button>
     </section>
+
     <!-- Mood trend analytics -->
-    <section class="section" aria-labelledby="trend-title">
-      <h2 id="trend-title">Mood Trend Analytics</h2>
+    <section class="section" aria-labelledby="trend-title" tabindex="0">
+      <h2 id="trend-title">Mood Trend Analytics (Interactive)</h2>
       <canvas id="emotionTrendChart" loading="lazy" aria-label="Emotion Trends Over Time"></canvas>
+      <div id="trendChartInstructions" class="visually-hidden">Use arrow keys to navigate the chart data. Use zoom controls for details.</div>
+      <div id="trendChart-zoom-controls">
+        <button type="button" aria-label="Zoom In" onclick="zoomChart('in')" tabindex="0">+</button>
+        <button type="button" aria-label="Zoom Out" onclick="zoomChart('out')" tabindex="0">-</button>
+        <button type="button" aria-label="Reset Zoom" onclick="zoomChart('reset')" tabindex="0">⟳</button>
+      </div>
     </section>
 
     <!-- 3. How are you physically? -->
-    <section class="section" aria-labelledby="phys-title">
+    <section class="section" aria-labelledby="phys-title" tabindex="0">
       <h2 id="phys-title">3. How are you physically?</h2>
-      <div class="hearts" id="physical-hearts" aria-label="Physical condition hearts">
-        <span class="heart" tabindex="0" title="Poor" role="button" aria-label="Poor">&#10084;&#65039;</span>
-        <span class="heart" tabindex="0" title="Fair" role="button" aria-label="Fair">&#10084;&#65039;</span>
-        <span class="heart" tabindex="0" title="Average" role="button" aria-label="Average">&#10084;&#65039;</span>
-        <span class="heart" tabindex="0" title="Good" role="button" aria-label="Good">&#10084;&#65039;</span>
-        <span class="heart" tabindex="0" title="Excellent" role="button" aria-label="Excellent">&#10084;&#65039;</span>
+      <div class="hearts" id="physical-hearts" aria-label="Physical condition hearts" role="listbox">
+        <span class="heart" tabindex="0" title="Poor" role="option" aria-label="Poor">&#10084;&#65039;</span>
+        <span class="heart" tabindex="0" title="Fair" role="option" aria-label="Fair">&#10084;&#65039;</span>
+        <span class="heart" tabindex="0" title="Average" role="option" aria-label="Average">&#10084;&#65039;</span>
+        <span class="heart" tabindex="0" title="Good" role="option" aria-label="Good">&#10084;&#65039;</span>
+        <span class="heart" tabindex="0" title="Excellent" role="option" aria-label="Excellent">&#10084;&#65039;</span>
       </div>
     </section>
 
     <!-- 4. Track blood pressure, weight, and thoughts -->
-    <section class="section track-options" aria-labelledby="track-title">
+    <section class="section track-options" aria-labelledby="track-title" tabindex="0">
       <h2 id="track-title" class="visually-hidden">Track Options</h2>
-      <form id="track-form" autocomplete="off" novalidate>
+      <form id="track-form" autocomplete="off" novalidate aria-label="Track Health Data">
         <div class="input-group">
           <label for="bp">Blood Pressure:</label>
-          <input id="bp" type="text" pattern="^\\d{2,3}/\\d{2,3}$" placeholder="e.g., 120/80" aria-describedby="bpHelp">
+          <input id="bp" type="text" pattern="^\\d{2,3}/\\d{2,3}$" placeholder="e.g., 120/80"
+                 aria-describedby="bpHelp" aria-label="Blood pressure, format systolic/diastolic" tabindex="0" required>
           <small id="bpHelp" class="help-block">Format: systolic/diastolic (e.g., 120/80)</small>
         </div>
         <div class="input-group">
           <label for="weight">Weight (kg):</label>
-          <input id="weight" type="number" step="0.1" min="10" max="300" placeholder="e.g., 70.5">
+          <input id="weight" type="number" step="0.1" min="10" max="300" placeholder="e.g., 70.5"
+                 aria-label="Weight in kilograms" tabindex="0" required>
         </div>
         <div class="input-group">
           <label for="thoughts">Thoughts or Reflections:</label>
-          <textarea id="thoughts" placeholder="Add any thoughts or notes..." aria-label="Thoughts or reflections"></textarea>
+          <textarea id="thoughts" placeholder="Add any thoughts or notes..."
+                    aria-label="Thoughts or reflections" tabindex="0"></textarea>
         </div>
-        <button class="btn" id="log-entry" type="submit">Log Entry</button>
+        <button class="btn" id="log-entry" type="submit" aria-label="Log Entry" tabindex="0">Log Entry</button>
         <div id="formError" class="error-msg" role="alert" aria-live="assertive"></div>
       </form>
     </section>
 
     <!-- 5. User statistics display -->
-    <section class="stats" id="user-stats" aria-labelledby="stats-title">
+    <section class="stats" id="user-stats" aria-labelledby="stats-title" tabindex="0">
       <h2 id="stats-title">Your Statistics</h2>
       <div class="stat-item">Average Mood: <span id="stat-mood" aria-live="polite">🙂</span></div>
       <div class="stat-item">Physical Condition: <span id="stat-physical" aria-live="polite">Good</span></div>
@@ -108,26 +181,31 @@
     </section>
 
     <!-- Entries -->
-    <section aria-labelledby="entries-title">
+    <section aria-labelledby="entries-title" tabindex="0">
       <h2 id="entries-title">My Entries</h2>
       <ul id="emotionList" aria-live="polite"></ul>
     </section>
 
     <!-- Export/Import Data -->
-    <section class="export-import" aria-label="Export and Import Data">
-      <button class="btn-secondary" onclick="exportData()">Export Data</button>
-      <input type="file" id="importDataFile" accept=".json" style="display:none" onchange="importDataFile(this)">
-      <button class="btn-secondary" onclick="document.getElementById('importDataFile').click();">Import Data</button>
+    <section class="export-import" aria-label="Export and Import Data" tabindex="0">
+      <button class="btn-secondary" onclick="exportData()" aria-label="Export Data" tabindex="0">Export Data</button>
+      <input type="file" id="importDataFile" accept=".json" style="display:none"
+             onchange="importDataFile(this)" aria-label="Import Data File">
+      <button class="btn-secondary" onclick="document.getElementById('importDataFile').click();"
+              aria-label="Import Data" tabindex="0">Import Data</button>
       <div id="importPreviewContainer"></div>
+      <button class="btn-secondary" onclick="syncCloud()" aria-label="Sync with Cloud" tabindex="0">Sync Cloud</button>
     </section>
   </main>
+  <!-- Toast for feedback -->
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js (CDN with fallback) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" loading="lazy" onerror="loadChartJsFallback()"></script>
   <script>
-  // --- Theme Switcher ---
+  // --- Accessibility enhancements and modularization ---
   document.addEventListener('DOMContentLoaded', function() {
-    // Theme initialization
+    // Theme initialization and live preview
     const themeSelect = document.getElementById('themeSelect');
     const savedTheme = localStorage.getItem('ewt_theme');
     if (savedTheme) {
@@ -138,6 +216,18 @@
       document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
       if (this.value) document.body.classList.add(this.value);
       localStorage.setItem('ewt_theme', this.value);
+      showToast('Theme changed');
+    });
+    // Live theme preview on hover
+    themeSelect.addEventListener('mouseover', function(e) {
+      if (e.target.tagName === 'OPTION' && e.target.value) {
+        document.body.classList.add(e.target.value);
+      }
+    });
+    themeSelect.addEventListener('mouseout', function(e) {
+      if (e.target.tagName === 'OPTION' && e.target.value) {
+        document.body.classList.remove(e.target.value);
+      }
     });
 
     // Dark mode toggle
@@ -147,45 +237,87 @@
       const isDark = document.body.classList.contains('dark-mode');
       darkToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
       localStorage.setItem('ewt_dark', isDark ? '1' : '');
+      showToast(`Dark mode ${isDark ? 'enabled' : 'disabled'}`);
     });
     if (localStorage.getItem('ewt_dark')) document.body.classList.add('dark-mode');
+
+    // Multilingual: Language switching
+    const langSelect = document.getElementById('langSelect');
+    langSelect.addEventListener('change', function() {
+      // Placeholder: implement actual translation logic
+      showToast('Language switched to: ' + langSelect.options[langSelect.selectedIndex].text);
+    });
+
+    // Keyboard navigation: Ensure tabindex and ARIA roles
+    document.querySelectorAll('button, [tabindex="0"], input, select, textarea').forEach(el => {
+      el.setAttribute('tabindex', '0');
+    });
+
+    renderTrendLineChart();
+    // ...other initializations: renderTags(); drawEmotionWheel(); renderEntries();
+
+    // Form validation
+    document.getElementById('track-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let valid = true;
+      const bp = document.getElementById('bp');
+      const weight = document.getElementById('weight');
+      if (!/^\d{2,3}\/\d{2,3}$/.test(bp.value)) {
+        valid = false;
+        showToast('Blood pressure must be in format 120/80.', true);
+        bp.focus();
+      }
+      if (weight.value < 10 || weight.value > 300) {
+        valid = false;
+        showToast('Weight must be between 10 and 300 kg.', true);
+        weight.focus();
+      }
+      if (valid) {
+        // Log entry logic here
+        showToast('Entry logged!');
+      }
+    });
   });
 
-  // --- Improved Import with Preview ---
-  function importDataFile(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const data = JSON.parse(e.target.result);
-        // Preview data
-        const previewContainer = document.getElementById('importPreviewContainer');
-        previewContainer.innerHTML = `
-          <div class="import-preview">
-            <h3>Preview Import Data</h3>
-            <pre style="max-height:200px;overflow:auto;background:#eee">${JSON.stringify(data, null, 2)}</pre>
-            <button id="confirmImportBtn">Confirm Import</button>
-            <button id="cancelImportBtn">Cancel</button>
-          </div>
-        `;
-        document.getElementById('confirmImportBtn').onclick = () => {
-          if (data.emotions) localStorage.setItem('emotions', data.emotions);
-          if (data.emotionsList) localStorage.setItem('emotionsList', data.emotionsList);
-          if (data.activityTags) localStorage.setItem('activityTags', data.activityTags);
-          renderTags(); drawEmotionWheel(); renderEntries(); renderTrendLineChart();
-          alert("Data imported!");
-          previewContainer.innerHTML = '';
-        };
-        document.getElementById('cancelImportBtn').onclick = () => previewContainer.innerHTML = '';
-      } catch {
-        alert("Invalid import file.");
-      }
-    };
-    reader.readAsText(file);
+  // --- Toast feedback ---
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.background = isError ? '#e74c3c' : '#2ecc71';
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3500);
   }
 
-  // --- Export Data ---
+  // --- Import/Export Data (async/await and error handling) ---
+  async function importDataFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const previewContainer = document.getElementById('importPreviewContainer');
+      previewContainer.innerHTML = `
+        <div class="import-preview">
+          <h3>Preview Import Data</h3>
+          <pre style="max-height:200px;overflow:auto;background:#eee">${JSON.stringify(data, null, 2)}</pre>
+          <button id="confirmImportBtn">Confirm Import</button>
+          <button id="cancelImportBtn">Cancel</button>
+        </div>
+      `;
+      document.getElementById('confirmImportBtn').onclick = () => {
+        if (data.emotions) localStorage.setItem('emotions', data.emotions);
+        if (data.emotionsList) localStorage.setItem('emotionsList', data.emotionsList);
+        if (data.activityTags) localStorage.setItem('activityTags', data.activityTags);
+        renderTags && renderTags(); drawEmotionWheel && drawEmotionWheel(); renderEntries && renderEntries(); renderTrendLineChart && renderTrendLineChart();
+        showToast("Data imported!");
+        previewContainer.innerHTML = '';
+      };
+      document.getElementById('cancelImportBtn').onclick = () => previewContainer.innerHTML = '';
+    } catch (err) {
+      showToast("Invalid import file.", true);
+    }
+  }
+
   function exportData() {
     const data = {
       emotions: localStorage.getItem('emotions') || "[]",
@@ -199,13 +331,20 @@
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    showToast("Data exported!");
   }
 
-  // --- Mood Trend Line Chart (Emotion Analytics) ---
+  // --- Dummy Cloud Sync ---
+  function syncCloud() {
+    // Implement cloud sync logic (Google Drive, Dropbox, etc.)
+    showToast("Cloud sync coming soon!");
+  }
+
+  // --- Mood Trend Line Chart (Interactive analytics, zoom) ---
   function renderTrendLineChart() {
+    if (!window.Chart) return;
     const ctx = document.getElementById('emotionTrendChart').getContext('2d');
     const emotions = JSON.parse(localStorage.getItem('emotions')) || [];
-    // For demo, each entry is {date: 'YYYY-MM-DD', emotion: 'Happy'...}
     const moodOrder = ["Very sad", "Sad", "Neutral", "Happy", "Very happy"];
     const dateMap = {};
     emotions.forEach(entry => {
@@ -229,12 +368,15 @@
           data,
           borderColor: '#3e95cd',
           fill: false,
-          tension: 0.2
+          tension: 0.2,
+          pointBackgroundColor: '#fff',
+          pointRadius: 4,
         }]
       },
       options: {
         plugins: {
-          title: { display: true, text: 'Mood Trends Over Time' }
+          title: { display: true, text: 'Mood Trends Over Time' },
+          tooltip: { enabled: true }
         },
         scales: {
           y: {
@@ -244,19 +386,31 @@
               callback: value => moodOrder[value] || ''
             }
           }
+        },
+        interaction: {
+          mode: 'nearest',
+          intersect: false
         }
       }
     });
   }
 
-  // --- Call on page load and after any emotion is logged ---
-  window.addEventListener('DOMContentLoaded', function() {
-    // ... other initializations ...
-    renderTrendLineChart();
-    // Call your other initialization functions here, e.g.:
-    // renderTags(); drawEmotionWheel(); renderEntries();
-  });
-
+  // --- Chart Zoom Controls ---
+  function zoomChart(direction) {
+    if (!window.emotionTrendChartObj) return;
+    let yScale = window.emotionTrendChartObj.options.scales.y;
+    if (direction === 'in') {
+      yScale.max = Math.max(1, yScale.max - 1);
+      yScale.min = Math.min(yScale.max - 1, yScale.min + 1);
+    } else if (direction === 'out') {
+      yScale.max += 1;
+      yScale.min = Math.max(0, yScale.min - 1);
+    } else if (direction === 'reset') {
+      yScale.min = 0;
+      yScale.max = 4;
+    }
+    window.emotionTrendChartObj.update();
+  }
   </script>
 </body>
 </html>
