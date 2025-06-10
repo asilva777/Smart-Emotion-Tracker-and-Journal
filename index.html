@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Daily Digital Journal</title>
+  <title>Emotional Wellness Tracker</title>
   <meta name="description" content="Track your emotional wellness daily with interactive tools.">
   <meta name="author" content="Your Name">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self';">
@@ -12,10 +12,20 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-  <button class="dark-toggle btn-secondary" aria-pressed="false" aria-label="Toggle dark mode" id="darkToggle">🌙</button>
+  <header>
+    <h1>Emotional Wellness Tracker</h1>
+    <div class="theme-controls">
+      <button class="dark-toggle btn-secondary" aria-pressed="false" aria-label="Toggle dark mode" id="darkToggle">🌙</button>
+      <label for="themeSelect" class="visually-hidden">Choose Theme</label>
+      <select id="themeSelect" aria-label="Choose Theme">
+        <option value="">Default</option>
+        <option value="theme-blue">Blue</option>
+        <option value="theme-green">Green</option>
+        <option value="theme-orange">Orange</option>
+      </select>
+    </div>
+  </header>
   <main class="container" role="main">
-    <h1>Daily Digital Journal</h1>
-    
     <!-- 1. What’s going on now? -->
     <section class="section" aria-labelledby="activity-title">
       <h2 id="activity-title">1. What's going on now?</h2>
@@ -47,7 +57,11 @@
         <button type="button" onclick="addEmotion()">Add Emotion</button>
       </form>
       <button id="saveEmotion" disabled>Save Emotion</button>
-      <canvas id="emotionBarChart" loading="lazy" aria-label="Emotions Over Time"></canvas>
+    </section>
+    <!-- Mood trend analytics -->
+    <section class="section" aria-labelledby="trend-title">
+      <h2 id="trend-title">Mood Trend Analytics</h2>
+      <canvas id="emotionTrendChart" loading="lazy" aria-label="Emotion Trends Over Time"></canvas>
     </section>
 
     <!-- 3. How are you physically? -->
@@ -104,12 +118,145 @@
       <button class="btn-secondary" onclick="exportData()">Export Data</button>
       <input type="file" id="importDataFile" accept=".json" style="display:none" onchange="importDataFile(this)">
       <button class="btn-secondary" onclick="document.getElementById('importDataFile').click();">Import Data</button>
+      <div id="importPreviewContainer"></div>
     </section>
   </main>
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Main App Script -->
-  <script src="script.js"></script>
+  <script>
+  // --- Theme Switcher ---
+  document.addEventListener('DOMContentLoaded', function() {
+    // Theme initialization
+    const themeSelect = document.getElementById('themeSelect');
+    const savedTheme = localStorage.getItem('ewt_theme');
+    if (savedTheme) {
+      themeSelect.value = savedTheme;
+      document.body.classList.add(savedTheme);
+    }
+    themeSelect.addEventListener('change', function() {
+      document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+      if (this.value) document.body.classList.add(this.value);
+      localStorage.setItem('ewt_theme', this.value);
+    });
+
+    // Dark mode toggle
+    const darkToggle = document.getElementById('darkToggle');
+    darkToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      darkToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      localStorage.setItem('ewt_dark', isDark ? '1' : '');
+    });
+    if (localStorage.getItem('ewt_dark')) document.body.classList.add('dark-mode');
+  });
+
+  // --- Improved Import with Preview ---
+  function importDataFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        // Preview data
+        const previewContainer = document.getElementById('importPreviewContainer');
+        previewContainer.innerHTML = `
+          <div class="import-preview">
+            <h3>Preview Import Data</h3>
+            <pre style="max-height:200px;overflow:auto;background:#eee">${JSON.stringify(data, null, 2)}</pre>
+            <button id="confirmImportBtn">Confirm Import</button>
+            <button id="cancelImportBtn">Cancel</button>
+          </div>
+        `;
+        document.getElementById('confirmImportBtn').onclick = () => {
+          if (data.emotions) localStorage.setItem('emotions', data.emotions);
+          if (data.emotionsList) localStorage.setItem('emotionsList', data.emotionsList);
+          if (data.activityTags) localStorage.setItem('activityTags', data.activityTags);
+          renderTags(); drawEmotionWheel(); renderEntries(); renderTrendLineChart();
+          alert("Data imported!");
+          previewContainer.innerHTML = '';
+        };
+        document.getElementById('cancelImportBtn').onclick = () => previewContainer.innerHTML = '';
+      } catch {
+        alert("Invalid import file.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // --- Export Data ---
+  function exportData() {
+    const data = {
+      emotions: localStorage.getItem('emotions') || "[]",
+      emotionsList: localStorage.getItem('emotionsList') || "[]",
+      activityTags: localStorage.getItem('activityTags') || "[]"
+    };
+    const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "emotional-wellness-data.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  // --- Mood Trend Line Chart (Emotion Analytics) ---
+  function renderTrendLineChart() {
+    const ctx = document.getElementById('emotionTrendChart').getContext('2d');
+    const emotions = JSON.parse(localStorage.getItem('emotions')) || [];
+    // For demo, each entry is {date: 'YYYY-MM-DD', emotion: 'Happy'...}
+    const moodOrder = ["Very sad", "Sad", "Neutral", "Happy", "Very happy"];
+    const dateMap = {};
+    emotions.forEach(entry => {
+      if (!dateMap[entry.date]) dateMap[entry.date] = [];
+      dateMap[entry.date].push(entry.emotion);
+    });
+    const labels = Object.keys(dateMap).sort();
+    const data = labels.map(date => {
+      const moods = dateMap[date];
+      if (!moods.length) return null;
+      const avg = moods.map(m => moodOrder.indexOf(m)).reduce((a, b) => a + b, 0) / moods.length;
+      return avg;
+    });
+    if (window.emotionTrendChartObj) window.emotionTrendChartObj.destroy();
+    window.emotionTrendChartObj = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Average Mood',
+          data,
+          borderColor: '#3e95cd',
+          fill: false,
+          tension: 0.2
+        }]
+      },
+      options: {
+        plugins: {
+          title: { display: true, text: 'Mood Trends Over Time' }
+        },
+        scales: {
+          y: {
+            min: 0,
+            max: moodOrder.length - 1,
+            ticks: {
+              callback: value => moodOrder[value] || ''
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // --- Call on page load and after any emotion is logged ---
+  window.addEventListener('DOMContentLoaded', function() {
+    // ... other initializations ...
+    renderTrendLineChart();
+    // Call your other initialization functions here, e.g.:
+    // renderTags(); drawEmotionWheel(); renderEntries();
+  });
+
+  </script>
 </body>
 </html>
