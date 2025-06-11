@@ -1,6 +1,6 @@
-Journaland Tracker
+Journal and Tracker
 
-The Emotional Wellness Tracker is a simple, interactive web application designed to help users monitor their daily emotional states, recognize behavioral patterns, and build self-awareness for improved mental well-being.
+The Emotional Journal and Tracker is a simple, interactive web application designed to help users monitor their daily emotional states, recognize behavioral patterns, and build self-awareness for improved mental well-being.
 
 ## 🌟 Features
 
