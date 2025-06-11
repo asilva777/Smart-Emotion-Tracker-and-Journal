@@ -1,4 +1,4 @@
-JOurnaland Tracker
+Journaland Tracker
 
 The Emotional Wellness Tracker is a simple, interactive web application designed to help users monitor their daily emotional states, recognize behavioral patterns, and build self-awareness for improved mental well-being.
 
