@@ -2,415 +2,502 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Emotional Wellness Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Emotional Wellness Tracker – Monitor Your Mood, Emotions, and Wellbeing</title>
-  <meta name="description" content="Track your emotional wellness daily with interactive tools for mood, physical health, and analytics. Build self-awareness for improved mental well-being.">
-  <meta name="keywords" content="emotional wellness, mood tracker, mental health, analytics, wellbeing, emotions, blood pressure, self-awareness">
-  <meta name="author" content="Your Name">
-  <!-- Open Graph for SEO and Social Sharing -->
-  <meta property="og:title" content="Emotional Wellness Tracker">
-  <meta property="og:description" content="Monitor and analyze your emotional and physical wellness daily.">
-  <meta property="og:image" content="https://appimize.app/assets/apps/user_1097/images/b727d34eb16a_314_1097.png">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://resilienceone-app.cognitioplus.com">
-
-  <!-- Structured Data: JSON-LD -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "WELLNESS JOURNAL; ",
-    "description": "A web app to monitor mood, emotions, and health trends.",
-    "url": "https://github.com/asilva777/emotional-wellness-tracker",
-    "applicationCategory": "HealthApplication"
-  }
-  </script>
-
-  <!-- Manifest and Favicon -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-
-  <!-- Content Security Policy -->
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
-
-  <!-- Fallback for Chart.js if CDN fails -->
-  <script>
-    function loadChartJsFallback() {
-      var script = document.createElement('script');
-      script.src = 'chart.bundle.min.js'; // Local fallback
-      document.head.appendChild(script);
-    }
-  </script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f6f7fb; color: #23272f; }
+    header, main { max-width: 840px; margin: auto; padding: 1.5em; }
+    header { background: #2ecc71; color: #fff; border-radius: 0 0 10px 10px;}
+    h1, h2 { margin-top: 0; }
+    section { margin-bottom: 2em; }
+    .controls { display: flex; gap: 1em; flex-wrap: wrap; align-items: center; }
+    label { font-weight: bold; margin-right: 0.5em; }
+    select, input[type="text"], input[type="number"], input[type="color"] { padding: 0.3em; border-radius: 4px; border: 1px solid #bbb; }
+    .hearts { display: flex; gap: 0.5em;}
+    .heart { cursor: pointer; font-size: 1.6em; user-select: none; transition: transform 0.1s;}
+    .heart[aria-selected="true"] { color: #e74c3c; transform: scale(1.2);}
+    .tag { background: #ecf0f1; padding: 0.2em 0.6em; border-radius: 3px; margin-right: 0.2em; margin-bottom: 0.2em; display: inline-block;}
+    #toast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 1em 2em; border-radius: 8px; color: #fff; font-weight: bold; z-index: 99; }
+    #emotionList { list-style: none; padding: 0; }
+    #emotionList li { background: #fff; border-radius: 4px; box-shadow: 0 1px 3px #0001; margin-bottom: 0.4em; padding: 0.7em; display: flex; align-items: center; }
+    .import-preview { background: #f8f9fa; border: 1px solid #ccc; padding: 1em; border-radius: 5px; margin-top: 1em;}
+    .dark-mode { background: #222; color: #eee; }
+    .dark-mode header { background: #23272f; }
+    .dark-mode .tag { background: #333; color: #fff;}
+    .dark-mode #emotionList li { background: #333; color: #fff;}
+    .theme-blue { background: #e3eafd; }
+    .theme-green { background: #eafde7; }
+    .theme-yellow { background: #fffde7; }
+    .theme-pink { background: #fde7f9; }
+    .theme-gray { background: #f4f4f4; }
+  </style>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
-    <h1 id="main-title">Emotional Wellness Tracker</h1>
-    <nav aria-label="Main Navigation">
-      <ul class="visually-hidden">
-        <li><a href="#activity-title">Current Activity</a></li>
-        <li><a href="#mood-title">Mood</a></li>
-        <li><a href="#trend-title">Analytics</a></li>
-        <li><a href="#phys-title">Physical</a></li>
-        <li><a href="#track-title">Track Options</a></li>
-        <li><a href="#user-stats">Statistics</a></li>
-        <li><a href="#entries-title">Entries</a></li>
-      </ul>
-    </nav>
-    <div class="theme-controls" aria-label="Theme Controls">
-      <button class="dark-toggle btn-secondary"
-              aria-pressed="false"
-              aria-label="Toggle dark mode"
-              id="darkToggle"
-              tabindex="0">🌙</button>
-      <label for="themeSelect" class="visually-hidden">Choose Theme</label>
-      <select id="themeSelect" aria-label="Choose Theme" tabindex="0">
+    <h1>Journal and Tracker</h1>
+    <div class="controls" style="margin-top: 0.7em;">
+      <label for="themeSelect">Theme:</label>
+      <select id="themeSelect">
         <option value="">Default</option>
         <option value="theme-blue">Blue</option>
         <option value="theme-green">Green</option>
-        <option value="theme-orange">Orange</option>
-        <option value="theme-purple">Purple</option>
-        <option value="theme-highcontrast">High Contrast</option>
+        <option value="theme-yellow">Yellow</option>
+        <option value="theme-pink">Pink</option>
+        <option value="theme-gray">Gray</option>
       </select>
-    </div>
-    <div class="lang-switch" aria-label="Switch Language">
-      <label for="langSelect" class="visually-hidden">Choose Language</label>
-      <select id="langSelect" aria-label="Choose Language" tabindex="0">
+      <button id="darkToggle" aria-pressed="false" title="Toggle dark mode">🌙 Dark</button>
+      <label for="langSelect">Language:</label>
+      <select id="langSelect">
         <option value="en">English</option>
         <option value="es">Español</option>
         <option value="fr">Français</option>
-        <!-- Add more language options here -->
+        <option value="de">Deutsch</option>
+        <option value="pt">Português</option>
       </select>
+      <button onclick="exportData()">Export</button>
+      <label for="importFile" style="margin:0;">Import:</label>
+      <input type="file" id="importFile" accept=".json" style="width:auto;" onchange="importDataFile(this)">
+      <button onclick="syncCloud()">Cloud Sync</button>
     </div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <div id="importPreviewContainer"></div>
   </header>
-  <main class="container" role="main">
-    <!-- 1. What’s going on now? -->
-    <section class="section" aria-labelledby="activity-title" tabindex="0">
-      <h2 id="activity-title">1. What's going on now?</h2>
-      <div class="tags" id="activity-tags" role="listbox" aria-label="Activity tags"></div>
-      <form class="add-tag" onsubmit="return false;" aria-label="Add Activity Tag">
-        <input type="text" id="newTagName" maxlength="20" placeholder="Add tag (e.g. Study)"
-               aria-label="Add activity tag" tabindex="0">
-        <button type="button" onclick="addActivityTag()" aria-label="Add tag" tabindex="0">Add Tag</button>
+  <main>
+    <section>
+      <h2>Track Your Day</h2>
+      <form id="track-form" autocomplete="off">
+        <div style="display:flex;gap:1em;flex-wrap:wrap;">
+          <div>
+            <label for="bp">Blood Pressure (e.g., 120/80):</label>
+            <input type="text" id="bp" required pattern="\\d{2,3}/\\d{2,3}" title="Format: 120/80">
+          </div>
+          <div>
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" required min="10" max="300" step="0.1">
+          </div>
+          <div>
+            <label>Physical State:</label>
+            <span class="hearts">
+              <span class="heart" aria-label="Poor" tabindex="0" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128148;</span>
+              <span class="heart" aria-label="Below average" tabindex="0" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128156;</span>
+              <span class="heart" aria-label="Average" tabindex="0" aria-selected="true" style="color:#e67e22;" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128154;</span>
+              <span class="heart" aria-label="Good" tabindex="0" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128155;</span>
+              <span class="heart" aria-label="Excellent" tabindex="0" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128153;</span>
+            </span>
+          </div>
+        </div>
+        <div style="margin:1em 0 0.5em 0;">
+          <label for="thoughts">Notes/Thoughts (optional):</label>
+          <input type="text" id="thoughts" maxlength="240" style="width:60%;">
+        </div>
+        <div>
+          <label>Emotion:</label>
+          <span id="selected-emotion" style="display:inline-block;font-weight:bold;color:#f1c40f;margin-right:1em;">Neutral</span>
+          <svg id="emotion-wheel" width="320" height="320" role="listbox" aria-label="Emotion Wheel" style="vertical-align: middle;"></svg>
+        </div>
+        <button type="submit" style="margin-top:1em;">Log Entry</button>
       </form>
     </section>
-
-    <!-- 2. How’s your mood? -->
-    <section class="section" aria-labelledby="mood-title" tabindex="0">
-      <h2 id="mood-title">2. How's your mood?</h2>
-      <div id="emotion-wheel-container" aria-label="Emotion Wheel Section">
-        <svg id="emotion-wheel" width="320" height="320" viewBox="0 0 320 320"
-             aria-label="Emotion Wheel" tabindex="0" role="img" loading="lazy"></svg>
-        <div id="selected-emotion" aria-live="polite"></div>
-        <em class="instruction">Tap a segment to select your primary emotion</em>
-      </div>
-      <div class="faces" id="mood-faces" aria-label="Mood faces" role="listbox">
-        <span class="face" tabindex="0" title="Very sad" role="option" aria-label="Very sad">&#128577;</span>
-        <span class="face" tabindex="0" title="Sad" role="option" aria-label="Sad">&#128542;</span>
-        <span class="face" tabindex="0" title="Neutral" role="option" aria-label="Neutral">&#128528;</span>
-        <span class="face" tabindex="0" title="Happy" role="option" aria-label="Happy">&#128522;</span>
-        <span class="face" tabindex="0" title="Very happy" role="option" aria-label="Very happy">&#128515;</span>
-      </div>
-      <form class="add-emotion" onsubmit="return false;" aria-label="Add New Emotion">
-        <input type="text" id="newEmotionName" maxlength="20"
-               placeholder="New emotion (e.g. Grateful)"
-               aria-label="New emotion" tabindex="0">
-        <input type="color" id="newEmotionColor" value="#888888" aria-label="Pick color" tabindex="0">
-        <button type="button" onclick="addEmotion()" aria-label="Add emotion" tabindex="0">Add Emotion</button>
-      </form>
-      <button id="saveEmotion" disabled aria-label="Save Emotion" tabindex="0">Save Emotion</button>
+    <section>
+      <h2>Activity Tags</h2>
+      <div id="activity-tags" style="margin-bottom:0.5em;"></div>
+      <input type="text" id="newTagName" placeholder="Add new tag" maxlength="16">
+      <button onclick="addActivityTag()">Add Tag</button>
     </section>
-
-    <!-- Mood trend analytics -->
-    <section class="section" aria-labelledby="trend-title" tabindex="0">
-      <h2 id="trend-title">Mood Trend Analytics (Interactive)</h2>
-      <canvas id="emotionTrendChart" loading="lazy" aria-label="Emotion Trends Over Time"></canvas>
-      <div id="trendChartInstructions" class="visually-hidden">Use arrow keys to navigate the chart data. Use zoom controls for details.</div>
-      <div id="trendChart-zoom-controls">
-        <button type="button" aria-label="Zoom In" onclick="zoomChart('in')" tabindex="0">+</button>
-        <button type="button" aria-label="Zoom Out" onclick="zoomChart('out')" tabindex="0">-</button>
-        <button type="button" aria-label="Reset Zoom" onclick="zoomChart('reset')" tabindex="0">⟳</button>
+    <section>
+      <h2>Recent Entries</h2>
+      <ul id="emotionList"></ul>
+    </section>
+    <section>
+      <h2>Mood Trend Chart</h2>
+      <canvas id="emotionTrendChart" width="600" height="280" aria-label="Mood trend chart" role="img"></canvas>
+      <div style="margin-top:0.6em;">
+        <button onclick="zoomChart('in')">Zoom In</button>
+        <button onclick="zoomChart('out')">Zoom Out</button>
+        <button onclick="zoomChart('reset')">Reset Zoom</button>
       </div>
     </section>
-
-    <!-- 3. How are you physically? -->
-    <section class="section" aria-labelledby="phys-title" tabindex="0">
-      <h2 id="phys-title">3. How are you physically?</h2>
-      <div class="hearts" id="physical-hearts" aria-label="Physical condition hearts" role="listbox">
-        <span class="heart" tabindex="0" title="Poor" role="option" aria-label="Poor">&#10084;&#65039;</span>
-        <span class="heart" tabindex="0" title="Fair" role="option" aria-label="Fair">&#10084;&#65039;</span>
-        <span class="heart" tabindex="0" title="Average" role="option" aria-label="Average">&#10084;&#65039;</span>
-        <span class="heart" tabindex="0" title="Good" role="option" aria-label="Good">&#10084;&#65039;</span>
-        <span class="heart" tabindex="0" title="Excellent" role="option" aria-label="Excellent">&#10084;&#65039;</span>
-      </div>
-    </section>
-
-    <!-- 4. Track blood pressure, weight, and thoughts -->
-    <section class="section track-options" aria-labelledby="track-title" tabindex="0">
-      <h2 id="track-title" class="visually-hidden">Track Options</h2>
-      <form id="track-form" autocomplete="off" novalidate aria-label="Track Health Data">
-        <div class="input-group">
-          <label for="bp">Blood Pressure:</label>
-          <input id="bp" type="text" pattern="^\\d{2,3}/\\d{2,3}$" placeholder="e.g., 120/80"
-                 aria-describedby="bpHelp" aria-label="Blood pressure, format systolic/diastolic" tabindex="0" required>
-          <small id="bpHelp" class="help-block">Format: systolic/diastolic (e.g., 120/80)</small>
-        </div>
-        <div class="input-group">
-          <label for="weight">Weight (kg):</label>
-          <input id="weight" type="number" step="0.1" min="10" max="300" placeholder="e.g., 70.5"
-                 aria-label="Weight in kilograms" tabindex="0" required>
-        </div>
-        <div class="input-group">
-          <label for="thoughts">Thoughts or Reflections:</label>
-          <textarea id="thoughts" placeholder="Add any thoughts or notes..."
-                    aria-label="Thoughts or reflections" tabindex="0"></textarea>
-        </div>
-        <button class="btn" id="log-entry" type="submit" aria-label="Log Entry" tabindex="0">Log Entry</button>
-        <div id="formError" class="error-msg" role="alert" aria-live="assertive"></div>
-      </form>
-    </section>
-
-    <!-- 5. User statistics display -->
-    <section class="stats" id="user-stats" aria-labelledby="stats-title" tabindex="0">
-      <h2 id="stats-title">Your Statistics</h2>
-      <div class="stat-item">Average Mood: <span id="stat-mood" aria-live="polite">🙂</span></div>
-      <div class="stat-item">Physical Condition: <span id="stat-physical" aria-live="polite">Good</span></div>
-      <div class="stat-item">Blood Pressure: <span id="stat-bp" aria-live="polite">120/80</span></div>
-      <div class="stat-item">Weight: <span id="stat-weight" aria-live="polite">70.5 kg</span></div>
-    </section>
-
-    <!-- Entries -->
-    <section aria-labelledby="entries-title" tabindex="0">
-      <h2 id="entries-title">My Entries</h2>
-      <ul id="emotionList" aria-live="polite"></ul>
-    </section>
-
-    <!-- Export/Import Data -->
-    <section class="export-import" aria-label="Export and Import Data" tabindex="0">
-      <button class="btn-secondary" onclick="exportData()" aria-label="Export Data" tabindex="0">Export Data</button>
-      <input type="file" id="importDataFile" accept=".json" style="display:none"
-             onchange="importDataFile(this)" aria-label="Import Data File">
-      <button class="btn-secondary" onclick="document.getElementById('importDataFile').click();"
-              aria-label="Import Data" tabindex="0">Import Data</button>
-      <div id="importPreviewContainer"></div>
-      <button class="btn-secondary" onclick="syncCloud()" aria-label="Sync with Cloud" tabindex="0">Sync Cloud</button>
+    <section>
+      <h2>Add Custom Emotion</h2>
+      <input type="text" id="newEmotionName" placeholder="Emotion name" maxlength="18">
+      <input type="color" id="newEmotionColor" value="#888888">
+      <button onclick="addEmotion()">Add Emotion</button>
     </section>
   </main>
-  <!-- Toast for feedback -->
-  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- Chart.js (CDN with fallback) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" loading="lazy" onerror="loadChartJsFallback()"></script>
   <script>
-  // --- Accessibility enhancements and modularization ---
-  document.addEventListener('DOMContentLoaded', function() {
-    // Theme initialization and live preview
-    const themeSelect = document.getElementById('themeSelect');
-    const savedTheme = localStorage.getItem('ewt_theme');
-    if (savedTheme) {
-      themeSelect.value = savedTheme;
-      document.body.classList.add(savedTheme);
+    // Heart selection for Physical State
+    function selectHeart(el) {
+      document.querySelectorAll('.hearts .heart').forEach(h => h.setAttribute('aria-selected', 'false'));
+      el.setAttribute('aria-selected', 'true');
     }
-    themeSelect.addEventListener('change', function() {
-      document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
-      if (this.value) document.body.classList.add(this.value);
-      localStorage.setItem('ewt_theme', this.value);
-      showToast('Theme changed');
-    });
-    // Live theme preview on hover
-    themeSelect.addEventListener('mouseover', function(e) {
-      if (e.target.tagName === 'OPTION' && e.target.value) {
-        document.body.classList.add(e.target.value);
+  </script>
+  <!-- Insert all of script.js below -->
+  <script>
+    // ---- Accessibility and Theme/Language Controls ----
+    document.addEventListener('DOMContentLoaded', function() {
+      // Theme selection and persistence
+      const themeSelect = document.getElementById('themeSelect');
+      const savedTheme = localStorage.getItem('ewt_theme');
+      if (savedTheme) {
+        themeSelect.value = savedTheme;
+        document.body.classList.add(savedTheme);
       }
-    });
-    themeSelect.addEventListener('mouseout', function(e) {
-      if (e.target.tagName === 'OPTION' && e.target.value) {
-        document.body.classList.remove(e.target.value);
-      }
-    });
+      themeSelect.addEventListener('change', function() {
+        document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
+        if (this.value) document.body.classList.add(this.value);
+        localStorage.setItem('ewt_theme', this.value);
+        showToast('Theme changed');
+      });
+      // Live preview of themes
+      themeSelect.addEventListener('mouseover', function(e) {
+        if (e.target.tagName === 'OPTION' && e.target.value)
+          document.body.classList.add(e.target.value);
+      });
+      themeSelect.addEventListener('mouseout', function(e) {
+        if (e.target.tagName === 'OPTION' && e.target.value)
+          document.body.classList.remove(e.target.value);
+      });
 
-    // Dark mode toggle
-    const darkToggle = document.getElementById('darkToggle');
-    darkToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      darkToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-      localStorage.setItem('ewt_dark', isDark ? '1' : '');
-      showToast(`Dark mode ${isDark ? 'enabled' : 'disabled'}`);
-    });
-    if (localStorage.getItem('ewt_dark')) document.body.classList.add('dark-mode');
+      // Dark mode toggle
+      const darkToggle = document.getElementById('darkToggle');
+      darkToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        darkToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        localStorage.setItem('ewt_dark', isDark ? '1' : '');
+        showToast('Dark mode ' + (isDark ? 'enabled' : 'disabled'));
+      });
+      if (localStorage.getItem('ewt_dark')) document.body.classList.add('dark-mode');
 
-    // Multilingual: Language switching
-    const langSelect = document.getElementById('langSelect');
-    langSelect.addEventListener('change', function() {
-      // Placeholder: implement actual translation logic
-      showToast('Language switched to: ' + langSelect.options[langSelect.selectedIndex].text);
-    });
+      // Language selection (placeholder)
+      const langSelect = document.getElementById('langSelect');
+      langSelect.addEventListener('change', function() {
+        // TODO: Integrate an i18n library or your translations here
+        showToast('Language switched: ' + langSelect.options[langSelect.selectedIndex].text);
+      });
 
-    // Keyboard navigation: Ensure tabindex and ARIA roles
-    document.querySelectorAll('button, [tabindex="0"], input, select, textarea').forEach(el => {
-      el.setAttribute('tabindex', '0');
-    });
+      // Keyboard Accessibility: Ensure tabindex
+      document.querySelectorAll('button, [tabindex="0"], input, select, textarea').forEach(el => {
+        el.setAttribute('tabindex', '0');
+      });
 
-    renderTrendLineChart();
-    // ...other initializations: renderTags(); drawEmotionWheel(); renderEntries();
+      // Initialize core UI
+      renderTags();
+      drawEmotionWheel();
+      renderEntries();
+      renderTrendLineChart();
 
-    // Form validation
-    document.getElementById('track-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      let valid = true;
-      const bp = document.getElementById('bp');
-      const weight = document.getElementById('weight');
-      if (!/^\d{2,3}\/\d{2,3}$/.test(bp.value)) {
-        valid = false;
-        showToast('Blood pressure must be in format 120/80.', true);
-        bp.focus();
-      }
-      if (weight.value < 10 || weight.value > 300) {
-        valid = false;
-        showToast('Weight must be between 10 and 300 kg.', true);
-        weight.focus();
-      }
-      if (valid) {
-        // Log entry logic here
-        showToast('Entry logged!');
-      }
-    });
-  });
-
-  // --- Toast feedback ---
-  function showToast(message, isError = false) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.style.background = isError ? '#e74c3c' : '#2ecc71';
-    toast.style.display = 'block';
-    setTimeout(() => { toast.style.display = 'none'; }, 3500);
-  }
-
-  // --- Import/Export Data (async/await and error handling) ---
-  async function importDataFile(input) {
-    const file = input.files[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      const previewContainer = document.getElementById('importPreviewContainer');
-      previewContainer.innerHTML = `
-        <div class="import-preview">
-          <h3>Preview Import Data</h3>
-          <pre style="max-height:200px;overflow:auto;background:#eee">${JSON.stringify(data, null, 2)}</pre>
-          <button id="confirmImportBtn">Confirm Import</button>
-          <button id="cancelImportBtn">Cancel</button>
-        </div>
-      `;
-      document.getElementById('confirmImportBtn').onclick = () => {
-        if (data.emotions) localStorage.setItem('emotions', data.emotions);
-        if (data.emotionsList) localStorage.setItem('emotionsList', data.emotionsList);
-        if (data.activityTags) localStorage.setItem('activityTags', data.activityTags);
-        renderTags && renderTags(); drawEmotionWheel && drawEmotionWheel(); renderEntries && renderEntries(); renderTrendLineChart && renderTrendLineChart();
-        showToast("Data imported!");
-        previewContainer.innerHTML = '';
-      };
-      document.getElementById('cancelImportBtn').onclick = () => previewContainer.innerHTML = '';
-    } catch (err) {
-      showToast("Invalid import file.", true);
-    }
-  }
-
-  function exportData() {
-    const data = {
-      emotions: localStorage.getItem('emotions') || "[]",
-      emotionsList: localStorage.getItem('emotionsList') || "[]",
-      activityTags: localStorage.getItem('activityTags') || "[]"
-    };
-    const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = "emotional-wellness-data.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    showToast("Data exported!");
-  }
-
-  // --- Dummy Cloud Sync ---
-  function syncCloud() {
-    // Implement cloud sync logic (Google Drive, Dropbox, etc.)
-    showToast("Cloud sync coming soon!");
-  }
-
-  // --- Mood Trend Line Chart (Interactive analytics, zoom) ---
-  function renderTrendLineChart() {
-    if (!window.Chart) return;
-    const ctx = document.getElementById('emotionTrendChart').getContext('2d');
-    const emotions = JSON.parse(localStorage.getItem('emotions')) || [];
-    const moodOrder = ["Very sad", "Sad", "Neutral", "Happy", "Very happy"];
-    const dateMap = {};
-    emotions.forEach(entry => {
-      if (!dateMap[entry.date]) dateMap[entry.date] = [];
-      dateMap[entry.date].push(entry.emotion);
-    });
-    const labels = Object.keys(dateMap).sort();
-    const data = labels.map(date => {
-      const moods = dateMap[date];
-      if (!moods.length) return null;
-      const avg = moods.map(m => moodOrder.indexOf(m)).reduce((a, b) => a + b, 0) / moods.length;
-      return avg;
-    });
-    if (window.emotionTrendChartObj) window.emotionTrendChartObj.destroy();
-    window.emotionTrendChartObj = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Average Mood',
-          data,
-          borderColor: '#3e95cd',
-          fill: false,
-          tension: 0.2,
-          pointBackgroundColor: '#fff',
-          pointRadius: 4,
-        }]
-      },
-      options: {
-        plugins: {
-          title: { display: true, text: 'Mood Trends Over Time' },
-          tooltip: { enabled: true }
-        },
-        scales: {
-          y: {
-            min: 0,
-            max: moodOrder.length - 1,
-            ticks: {
-              callback: value => moodOrder[value] || ''
-            }
-          }
-        },
-        interaction: {
-          mode: 'nearest',
-          intersect: false
+      // Form validation
+      document.getElementById('track-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let valid = true;
+        const bp = document.getElementById('bp');
+        const weight = document.getElementById('weight');
+        // BP format: 120/80
+        if (!/^\d{2,3}\/\d{2,3}$/.test(bp.value)) {
+          valid = false;
+          showToast('Blood pressure must be in format 120/80.', true);
+          bp.setAttribute('aria-invalid', 'true');
+          bp.focus();
+        } else {
+          bp.setAttribute('aria-invalid', 'false');
         }
-      }
+        if (weight.value < 10 || weight.value > 300) {
+          valid = false;
+          showToast('Weight must be between 10 and 300 kg.', true);
+          weight.setAttribute('aria-invalid', 'true');
+          weight.focus();
+        } else {
+          weight.setAttribute('aria-invalid', 'false');
+        }
+        if (valid) {
+          // Save entry
+          saveEntry();
+        }
+      });
     });
-  }
 
-  // --- Chart Zoom Controls ---
-  function zoomChart(direction) {
-    if (!window.emotionTrendChartObj) return;
-    let yScale = window.emotionTrendChartObj.options.scales.y;
-    if (direction === 'in') {
-      yScale.max = Math.max(1, yScale.max - 1);
-      yScale.min = Math.min(yScale.max - 1, yScale.min + 1);
-    } else if (direction === 'out') {
-      yScale.max += 1;
-      yScale.min = Math.max(0, yScale.min - 1);
-    } else if (direction === 'reset') {
-      yScale.min = 0;
-      yScale.max = 4;
+    // ---- Toast feedback ----
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.background = isError ? '#e74c3c' : '#2ecc71';
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
     }
-    window.emotionTrendChartObj.update();
-  }
+
+    // ---- Export/Import/Cloud Sync ----
+    async function importDataFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        const previewContainer = document.getElementById('importPreviewContainer');
+        previewContainer.innerHTML = `
+          <div class="import-preview">
+            <h3>Preview Import Data</h3>
+            <pre style="max-height:200px;overflow:auto;background:#eee">${JSON.stringify(data, null, 2)}</pre>
+            <button id="confirmImportBtn">Confirm Import</button>
+            <button id="cancelImportBtn">Cancel</button>
+          </div>
+        `;
+        document.getElementById('confirmImportBtn').onclick = () => {
+          if (data.emotions) localStorage.setItem('emotions', data.emotions);
+          if (data.emotionsList) localStorage.setItem('emotionsList', data.emotionsList);
+          if (data.activityTags) localStorage.setItem('activityTags', data.activityTags);
+          renderTags();
+          drawEmotionWheel();
+          renderEntries();
+          renderTrendLineChart();
+          showToast("Data imported!");
+          previewContainer.innerHTML = '';
+        };
+        document.getElementById('cancelImportBtn').onclick = () => previewContainer.innerHTML = '';
+      } catch (err) {
+        showToast("Invalid import file.", true);
+      }
+    }
+
+    function exportData() {
+      const data = {
+        emotions: localStorage.getItem('emotions') || "[]",
+        emotionsList: localStorage.getItem('emotionsList') || "[]",
+        activityTags: localStorage.getItem('activityTags') || "[]"
+      };
+      const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = "emotional-wellness-data.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast("Data exported!");
+    }
+
+    function syncCloud() {
+      // Placeholder for cloud sync logic (Google Drive API, Dropbox API, etc.)
+      showToast("Cloud sync coming soon!");
+    }
+
+    // ---- Entries and Tags ----
+    function saveEntry() {
+      const bp = document.getElementById('bp').value;
+      const weight = document.getElementById('weight').value;
+      const thoughts = document.getElementById('thoughts').value;
+      const emotion = document.getElementById('selected-emotion').textContent || "Neutral";
+      const physical = document.querySelector('.hearts .heart[aria-selected="true"]')?.getAttribute('aria-label') || "Average";
+      const date = new Date().toISOString().substr(0, 10);
+
+      let emotions = JSON.parse(localStorage.getItem('emotions') || "[]");
+      emotions.push({date, emotion, physical, bp, weight, thoughts});
+      localStorage.setItem('emotions', JSON.stringify(emotions));
+      renderEntries();
+      renderTrendLineChart();
+      showToast("Entry logged!");
+    }
+
+    function renderEntries() {
+      const entries = JSON.parse(localStorage.getItem('emotions') || "[]");
+      const list = document.getElementById('emotionList');
+      if (!list) return;
+      list.innerHTML = '';
+      entries.slice(-20).reverse().forEach(entry => {
+        const li = document.createElement('li');
+        li.innerHTML = `<b>${entry.date}</b>: <span>${entry.emotion}</span>
+          <small style="color:#888;">[BP: ${entry.bp}, Wt: ${entry.weight}kg, Phys: ${entry.physical}]</small>
+          <span style="flex:1"></span>
+          <em style="color:#555;">${entry.thoughts || ''}</em>`;
+        list.appendChild(li);
+      });
+    }
+
+    function renderTags() {
+      const tagData = JSON.parse(localStorage.getItem('activityTags') || "[]");
+      const tagBox = document.getElementById('activity-tags');
+      if (!tagBox) return;
+      tagBox.innerHTML = '';
+      tagData.forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = tag;
+        span.tabIndex = 0;
+        span.setAttribute('role', 'option');
+        span.setAttribute('aria-label', tag);
+        tagBox.appendChild(span);
+      });
+    }
+
+    function addActivityTag() {
+      const input = document.getElementById('newTagName');
+      const value = input.value.trim();
+      if (!value) return;
+      let tagData = JSON.parse(localStorage.getItem('activityTags') || "[]");
+      if (!tagData.includes(value)) {
+        tagData.push(value);
+        localStorage.setItem('activityTags', JSON.stringify(tagData));
+        renderTags();
+        showToast('Activity tag added!');
+      }
+      input.value = '';
+    }
+
+    // ---- Emotion Wheel ----
+    function drawEmotionWheel() {
+      const svg = document.getElementById('emotion-wheel');
+      if (!svg) return;
+      svg.innerHTML = ''; // Clear previous
+      // Example wheel with 5 emotions
+      const emotions = [
+        { label: 'Very sad', color: '#8e44ad' },
+        { label: 'Sad', color: '#3498db' },
+        { label: 'Neutral', color: '#f1c40f' },
+        { label: 'Happy', color: '#2ecc71' },
+        { label: 'Very happy', color: '#e67e22' }
+      ];
+      const radius = 140, cx = 160, cy = 160;
+      const angle = 2 * Math.PI / emotions.length;
+      emotions.forEach((emo, i) => {
+        const start = angle * i;
+        const end = angle * (i + 1);
+        const x1 = cx + radius * Math.cos(start);
+        const y1 = cy + radius * Math.sin(start);
+        const x2 = cx + radius * Math.cos(end);
+        const y2 = cy + radius * Math.sin(end);
+        const largeArcFlag = angle > Math.PI ? 1 : 0;
+        const d = `
+          M ${cx} ${cy}
+          L ${x1} ${y1}
+          A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
+          Z
+        `;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('fill', emo.color);
+        path.setAttribute('tabindex', '0');
+        path.setAttribute('aria-label', emo.label);
+        path.setAttribute('role', 'option');
+        path.addEventListener('click', () => selectEmotion(emo.label, emo.color));
+        path.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') selectEmotion(emo.label, emo.color);
+        });
+        svg.appendChild(path);
+        // Add emotion label
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        const tx = cx + (radius - 40) * Math.cos(start + angle / 2);
+        const ty = cy + (radius - 40) * Math.sin(start + angle / 2);
+        text.setAttribute('x', tx);
+        text.setAttribute('y', ty);
+        text.setAttribute('fill', '#23272f');
+        text.setAttribute('font-size', '1.1em');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('alignment-baseline', 'central');
+        text.textContent = emo.label;
+        svg.appendChild(text);
+      });
+    }
+    function selectEmotion(label, color) {
+      const sel = document.getElementById('selected-emotion');
+      sel.textContent = label;
+      sel.style.color = color;
+      showToast('Emotion selected: ' + label);
+    }
+
+    // ---- Mood Trend Chart ----
+    function renderTrendLineChart() {
+      if (!window.Chart) return;
+      const ctx = document.getElementById('emotionTrendChart').getContext('2d');
+      const emotions = JSON.parse(localStorage.getItem('emotions') || "[]");
+      const moodOrder = ["Very sad", "Sad", "Neutral", "Happy", "Very happy"];
+      const dateMap = {};
+      emotions.forEach(entry => {
+        if (!dateMap[entry.date]) dateMap[entry.date] = [];
+        dateMap[entry.date].push(entry.emotion);
+      });
+      const labels = Object.keys(dateMap).sort();
+      const data = labels.map(date => {
+        const moods = dateMap[date];
+        if (!moods.length) return null;
+        const avg = moods.map(m => moodOrder.indexOf(m)).reduce((a, b) => a + b, 0) / moods.length;
+        return avg;
+      });
+      if (window.emotionTrendChartObj) window.emotionTrendChartObj.destroy();
+      window.emotionTrendChartObj = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Average Mood',
+            data,
+            borderColor: '#3e95cd',
+            fill: false,
+            tension: 0.2,
+            pointBackgroundColor: '#fff',
+            pointRadius: 4,
+          }]
+        },
+        options: {
+          plugins: {
+            title: { display: true, text: 'Mood Trends Over Time' },
+            tooltip: { enabled: true },
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: moodOrder.length - 1,
+              ticks: {
+                callback: value => moodOrder[value] || ''
+              }
+            }
+          },
+          interaction: {
+            mode: 'nearest',
+            intersect: false
+          }
+        }
+      });
+    }
+
+    function zoomChart(direction) {
+      if (!window.emotionTrendChartObj) return;
+      let yScale = window.emotionTrendChartObj.options.scales.y;
+      if (direction === 'in') {
+        yScale.max = Math.max(1, yScale.max - 1);
+        yScale.min = Math.min(yScale.max - 1, yScale.min + 1);
+      } else if (direction === 'out') {
+        yScale.max += 1;
+        yScale.min = Math.max(0, yScale.min - 1);
+      } else if (direction === 'reset') {
+        yScale.min = 0;
+        yScale.max = 4;
+      }
+      window.emotionTrendChartObj.update();
+    }
+
+    // ---- Add Emotion ----
+    function addEmotion() {
+      const nameInput = document.getElementById('newEmotionName');
+      const colorInput = document.getElementById('newEmotionColor');
+      const name = nameInput.value.trim();
+      const color = colorInput.value;
+      if (!name) {
+        showToast('Emotion name required.', true);
+        return;
+      }
+      let emotionsList = JSON.parse(localStorage.getItem('emotionsList') || "[]");
+      if (!emotionsList.find(e => e.name === name)) {
+        emotionsList.push({ name, color });
+        localStorage.setItem('emotionsList', JSON.stringify(emotionsList));
+        showToast('New emotion added!');
+        drawEmotionWheel();
+      } else {
+        showToast('Emotion already exists.', true);
+      }
+      nameInput.value = '';
+      colorInput.value = '#888888';
+    }
   </script>
 </body>
 </html>
