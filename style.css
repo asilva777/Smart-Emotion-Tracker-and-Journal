@@ -1,329 +1,349 @@
-/* Base styles */
+/* ==== Base Styles ==== */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: 'Oswald', 'Montseratt', sans-serif;
-  background: #f4f6fa;
+  font-family: 'Segoe UI', 'Oswald', 'Montserrat', Arial, sans-serif;
+  background: #f6f7fb;
   color: #23272f;
   min-height: 100vh;
 }
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem;
+header, main {
+  max-width: 840px;
+  margin: auto;
+  padding: 1.5em;
 }
-
-/* Header and Navigation */
 header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  background: #34495e;
+  background: #2ecc71;
   color: #fff;
-  padding: 1rem 2rem;
-  border-bottom: 4px solid #2980b9;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 2px 8px #0002;
+  margin-bottom: 2em;
 }
 header h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 2.1rem;
   font-weight: 700;
+  letter-spacing: 1px;
 }
-
-.theme-controls,
-.lang-switch {
+.controls {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.theme-controls select,
-.lang-switch select {
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  padding: 0.3em 1.5em 0.3em 0.5em;
-  font-size: 1em;
-}
-
-.btn-secondary, .btn {
-  background: #2980b9;
-  color: #fff;
-  border: none;
-  padding: 0.55em 1.2em;
-  border-radius: 4px;
-  cursor: pointer;
-  margin: 0.15em;
-  font-size: 1em;
-  transition: background 0.2s;
-}
-
-.btn-secondary:hover, .btn:hover {
-  background: #1abc9c;
-}
-
-/* Section styling */
-.section {
-  margin-bottom: 2.5rem;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.08);
-}
-
-/* Accessibility: visually hidden for screen readers */
-.visually-hidden {
-  position: absolute !important;
-  height: 1px; width: 1px;
-  overflow: hidden;
-  clip: rect(1px, 1px, 1px, 1px);
-  white-space: nowrap;
-}
-
-/* Tags and Faces/Hearts */
-.tags, .faces, .hearts {
-  display: flex;
+  gap: 1em;
   flex-wrap: wrap;
-  gap: 0.4em;
-  margin-bottom: 1em;
+  align-items: center;
+  margin-top: 0.7em;
 }
-.tags .tag, .faces .face, .hearts .heart {
-  background: #ecf0f1;
-  border-radius: 14px;
-  padding: 0.25em 0.8em;
-  font-size: 1.15em;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: background 0.2s, border 0.2s, color 0.2s;
+label {
+  font-weight: 500;
+  margin-bottom: 0.2em;
+  display: inline-block;
 }
-.faces .face:focus, .hearts .heart:focus, .tags .tag:focus {
-  outline: 2px solid #2980b9;
-  border-color: #2980b9;
-  background: #d6eaff;
-}
-
-.faces .face[aria-selected="true"],
-.hearts .heart[aria-selected="true"],
-.tags .tag[aria-selected="true"] {
-  background: #2980b9;
-  color: #fff;
-}
-
-input[type="text"], input[type="number"], input[type="color"], textarea, select {
+select, input[type="text"], input[type="number"], input[type="color"], textarea {
   border: 1.5px solid #bfc9d1;
-  padding: 0.55em 0.8em;
+  padding: 0.45em 0.8em;
   border-radius: 5px;
-  margin: 0.2em 0.2em 0.7em 0;
   font-size: 1em;
-  box-sizing: border-box;
   background: #fff;
+  margin-right: 0.3em;
+  margin-bottom: 0.3em;
+  box-sizing: border-box;
+  transition: border 0.2s;
 }
 input[type="color"] {
   padding: 0.1em;
   width: 2.3em;
   height: 2.3em;
 }
-
 input:focus, textarea:focus, select:focus {
-  outline: 2px solid #007bff;
-  border-color: #007bff;
+  outline: 2px solid #2980b9;
+  border-color: #2980b9;
 }
-
-label {
-  font-weight: 500;
-  margin-bottom: 0.1em;
-  display: block;
+input[aria-invalid="true"], textarea[aria-invalid="true"] {
+  border-color: #e74c3c;
+  background: #fff5f5;
 }
-
-/* Stat Display */
-.stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2.5em;
-  background: #f9fafc;
-  border-radius: 10px;
-  margin-bottom: 2rem;
-  padding: 1.25rem 2rem;
-  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.07);
-}
-.stat-item {
-  font-size: 1.2em;
-  font-weight: 600;
-}
-
-#emotionTrendChart {
-  width: 100% !important;
-  max-width: 800px;
-  height: 340px !important;
-  margin: 0 auto 1em;
-  background: #fff;
-  border-radius: 12px;
-}
-
-#importPreviewContainer {
-  margin-top: 0.7em;
-}
-
-.error-msg {
-  color: #e74c3c;
-  font-size: 1em;
-  margin-top: 0.8em;
-  min-height: 1.5em;
-}
-
-.import-preview {
-  background: #f7f9fa;
-  border-radius: 6px;
-  box-shadow: 0 0 4px #d1dbe3;
-  padding: 1em;
-  margin-top: 1em;
-}
-.import-preview h3 {
-  margin-top: 0;
-}
-
-/* Toast feedback */
-.toast {
+input[type="file"] {
   display: none;
-  position: fixed;
-  z-index: 9999;
-  right: 1.5em;
-  bottom: 1.5em;
-  min-width: 240px;
-  max-width: 330px;
-  background: #2ecc71;
+}
+
+/* ==== Buttons ==== */
+button, .btn, .btn-secondary {
+  background: #2980b9;
   color: #fff;
-  padding: 1em 1.6em;
-  border-radius: 8px;
-  font-size: 1.1em;
-  box-shadow: 0 2px 10px rgba(44, 62, 80, 0.12);
-  transition: opacity 0.3s;
+  border: none;
+  padding: 0.55em 1.15em;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0.15em;
+  font-size: 1em;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+button:hover, .btn:hover, .btn-secondary:hover {
+  background: #1abc9c;
+  color: #fff;
+}
+button[aria-pressed="true"], .btn[aria-pressed="true"] {
+  background: #34495e;
+  color: #fff;
 }
 
-.toast[aria-live="polite"] {
-  background: #2ecc71;
+/* ==== Section Styles ==== */
+section {
+  margin-bottom: 2em;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px #0001;
 }
-.toast[aria-live="assertive"] {
-  background: #e74c3c;
-}
-
-/* Theme Colors */
-body.theme-blue { background: #eaf6ff; }
-body.theme-green { background: #eaffea; }
-body.theme-orange { background: #fff5e5; }
-body.theme-purple { background: #f5eaff; }
-body.theme-highcontrast { background: #000; color: #fff; }
-
-/* High contrast for accessibility */
-body.theme-highcontrast header,
-body.theme-highcontrast .section,
-body.theme-highcontrast .stats,
-body.theme-highcontrast .import-preview {
-  background: #111 !important;
-  color: #fff !important;
-  border-color: #fff !important;
-}
-
-body.theme-highcontrast .btn,
-body.theme-highcontrast .btn-secondary {
-  background: #fff !important;
-  color: #000 !important;
-  border: 2px solid #fff;
-}
-
-body.theme-highcontrast .faces .face,
-body.theme-highcontrast .hearts .heart,
-body.theme-highcontrast .tags .tag {
-  background: #000 !important;
-  color: #fff !important;
-  border: 1.5px solid #fff;
-}
-
-/* Dark mode */
-body.dark-mode {
-  background: #23272f;
-  color: #eaf6ff;
-}
-body.dark-mode .section,
-body.dark-mode .stats,
-body.dark-mode .import-preview {
-  background: #2d3542;
-  color: #eaf6ff;
-}
-
-body.dark-mode header {
-  background: #23272f;
-  border-bottom: 4px solid #00c7a6;
-}
-
-body.dark-mode .btn, body.dark-mode .btn-secondary {
-  background: #00c7a6;
-  color: #23272f;
-}
-
-/* Responsive Layout */
-@media (max-width: 820px) {
-  .container {
-    padding: 0.5em;
+@media (max-width: 700px) {
+  header, main {
+    padding: 0.8em;
   }
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.8em;
-  }
-  .stats {
-    flex-direction: column;
-    gap: 1.3em;
+  section {
     padding: 1em;
   }
 }
 
-/* Trend Chart Zoom Controls */
-#trendChart-zoom-controls {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5em;
-  margin-bottom: 0.7em;
-}
-
-#trendChart-zoom-controls button {
-  background: #f1c40f;
-  color: #23272f;
-  border: none;
-  padding: 0.5em 1em;
-  border-radius: 5px;
+/* ==== Toast Notification ==== */
+#toast {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1em 2em;
+  border-radius: 8px;
+  color: #fff;
   font-weight: bold;
   font-size: 1.1em;
-  cursor: pointer;
+  min-width: 220px;
+  z-index: 99;
+  background: #2ecc71;
+  box-shadow: 0 2px 10px #0002;
 }
-#trendChart-zoom-controls button:hover {
-  background: #f39c12;
+#toast.error, #toast[style*="#e74c3c"] {
+  background: #e74c3c !important;
 }
 
-/* Entries List */
+/* ==== Tags ==== */
+#activity-tags, .tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3em;
+  margin-bottom: 0.5em;
+}
+.tag {
+  background: #ecf0f1;
+  border-radius: 14px;
+  padding: 0.25em 0.8em;
+  font-size: 1.07em;
+  margin-bottom: 0.2em;
+  margin-right: 0.2em;
+  display: inline-block;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background 0.2s, border 0.2s, color 0.2s;
+}
+.tag:focus, .tag[aria-selected="true"] {
+  outline: 2px solid #2980b9;
+  border-color: #2980b9;
+  background: #d6eaff;
+  color: #205;
+}
+
+/* ==== Hearts (Physical State) ==== */
+.hearts {
+  display: flex;
+  gap: 0.5em;
+}
+.heart {
+  cursor: pointer;
+  font-size: 1.6em;
+  user-select: none;
+  transition: transform 0.15s, color 0.2s, background 0.2s;
+  border-radius: 50%;
+  padding: 0.1em 0.2em;
+  border: 2px solid transparent;
+  outline: none;
+  background: transparent;
+}
+.heart[aria-selected="true"] {
+  color: #e74c3c;
+  background: #fce4ec;
+  border-color: #e74c3c;
+  transform: scale(1.2);
+}
+.heart:focus {
+  border-color: #2980b9;
+  background: #d6eaff;
+}
+
+/* ==== Emotion Wheel ==== */
+#emotion-wheel {
+  margin-top: 1em;
+  display: inline-block;
+  background: #f8fafc;
+  box-shadow: 0 1px 8px #0001;
+  border-radius: 50%;
+}
+#emotion-wheel text {
+  pointer-events: none;
+  font-weight: 500;
+  text-shadow: 0 1px 2px #fff8;
+}
+#selected-emotion {
+  font-weight: bold;
+  font-size: 1.2em;
+  min-width: 90px;
+  display: inline-block;
+}
+
+/* ==== Entries List ==== */
 #emotionList {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 #emotionList li {
-  border-bottom: 1px solid #e5e9f2;
-  padding: 0.9em 0.3em;
-  font-size: 1.1em;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px #0001;
+  margin-bottom: 0.4em;
+  padding: 0.7em;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.7em;
+  font-size: 1.07em;
+}
+#emotionList li b {
+  margin-right: 0.4em;
+}
+#emotionList li em {
+  color: #555;
+  font-style: italic;
+}
+#emotionList li small {
+  color: #888;
 }
 #emotionList li:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
-/* Miscellaneous */
-input[aria-invalid="true"], textarea[aria-invalid="true"] {
-  border-color: #e74c3c;
-  background: #fff5f5;
+/* ==== Chart ==== */
+#emotionTrendChart {
+  width: 100% !important;
+  max-width: 800px;
+  height: 280px !important;
+  margin: 0 auto 1em;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px #0001;
+  display: block;
 }
 
+/* ==== Import Preview ==== */
+#importPreviewContainer {
+  margin-top: 0.7em;
+}
+.import-preview {
+  background: #f8f9fa;
+  border: 1px solid #ccc;
+  padding: 1em;
+  border-radius: 5px;
+  margin-top: 1em;
+}
+.import-preview h3 {
+  margin-top: 0;
+}
+
+/* ==== Miscellaneous ==== */
 input[type="file"] {
-  display: none;
+  display: inline-block;
+}
+input[type="file"]:focus {
+  outline: 2px solid #007bff;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.7;
+}
+
+/* ==== Themes ==== */
+body.theme-blue { background: #e3eafd; }
+body.theme-green { background: #eafde7; }
+body.theme-yellow { background: #fffde7; }
+body.theme-pink { background: #fde7f9; }
+body.theme-gray { background: #f4f4f4; }
+body.theme-blue header,
+body.theme-green header,
+body.theme-yellow header,
+body.theme-pink header,
+body.theme-gray header {
+  color: #222;
+}
+body.theme-blue section,
+body.theme-green section,
+body.theme-yellow section,
+body.theme-pink section,
+body.theme-gray section {
+  background: #fff;
+}
+
+/* ==== Dark Mode ==== */
+body.dark-mode {
+  background: #23272f;
+  color: #eaf6ff;
+}
+body.dark-mode header {
+  background: #23272f;
+  color: #eaf6ff;
+}
+body.dark-mode section {
+  background: #2d3542;
+  color: #eaf6ff;
+}
+body.dark-mode #emotionList li {
+  background: #333;
+  color: #fff;
+}
+body.dark-mode .tag {
+  background: #333;
+  color: #fff;
+}
+body.dark-mode .heart {
+  background: #23272f;
+  color: #eaf6ff;
+}
+body.dark-mode .heart[aria-selected="true"] {
+  background: #e74c3c;
+  color: #fff;
+}
+body.dark-mode #toast {
+  background: #34495e;
+  color: #fff;
+}
+
+/* ==== Responsive ==== */
+@media (max-width: 700px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5em;
+  }
+  #emotion-wheel {
+    width: 98vw;
+    height: 98vw;
+    max-width: 300px;
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  section {
+    padding: 0.6em;
+  }
+  #emotionTrendChart {
+    height: 180px !important;
+  }
 }
