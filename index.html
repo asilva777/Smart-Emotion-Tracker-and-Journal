@@ -2,502 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Emotional Wellness Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f6f7fb; color: #23272f; }
-    header, main { max-width: 840px; margin: auto; padding: 1.5em; }
-    header { background: #2ecc71; color: #fff; border-radius: 0 0 10px 10px;}
-    h1, h2 { margin-top: 0; }
-    section { margin-bottom: 2em; }
-    .controls { display: flex; gap: 1em; flex-wrap: wrap; align-items: center; }
-    label { font-weight: bold; margin-right: 0.5em; }
-    select, input[type="text"], input[type="number"], input[type="color"] { padding: 0.3em; border-radius: 4px; border: 1px solid #bbb; }
-    .hearts { display: flex; gap: 0.5em;}
-    .heart { cursor: pointer; font-size: 1.6em; user-select: none; transition: transform 0.1s;}
-    .heart[aria-selected="true"] { color: #e74c3c; transform: scale(1.2);}
-    .tag { background: #ecf0f1; padding: 0.2em 0.6em; border-radius: 3px; margin-right: 0.2em; margin-bottom: 0.2em; display: inline-block;}
-    #toast { display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 1em 2em; border-radius: 8px; color: #fff; font-weight: bold; z-index: 99; }
-    #emotionList { list-style: none; padding: 0; }
-    #emotionList li { background: #fff; border-radius: 4px; box-shadow: 0 1px 3px #0001; margin-bottom: 0.4em; padding: 0.7em; display: flex; align-items: center; }
-    .import-preview { background: #f8f9fa; border: 1px solid #ccc; padding: 1em; border-radius: 5px; margin-top: 1em;}
-    .dark-mode { background: #222; color: #eee; }
-    .dark-mode header { background: #23272f; }
-    .dark-mode .tag { background: #333; color: #fff;}
-    .dark-mode #emotionList li { background: #333; color: #fff;}
-    .theme-blue { background: #e3eafd; }
-    .theme-green { background: #eafde7; }
-    .theme-yellow { background: #fffde7; }
-    .theme-pink { background: #fde7f9; }
-    .theme-gray { background: #f4f4f4; }
-  </style>
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="description" content="Track your daily emotions and activities to improve self-awareness and well-being.">
+  <meta name="theme-color" content="#4a90e2">
+  <meta name="keywords" content="emotional wellness, tracker, mood, self-awareness, mental health">
+  <meta name="author" content="asilva777">
+  <title>Emotional Wellness Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="icons/icon-192.png">
 </head>
 <body>
   <header>
-    <h1>Journal and Tracker</h1>
-    <div class="controls" style="margin-top: 0.7em;">
-      <label for="themeSelect">Theme:</label>
-      <select id="themeSelect">
-        <option value="">Default</option>
-        <option value="theme-blue">Blue</option>
-        <option value="theme-green">Green</option>
-        <option value="theme-yellow">Yellow</option>
-        <option value="theme-pink">Pink</option>
-        <option value="theme-gray">Gray</option>
-      </select>
-      <button id="darkToggle" aria-pressed="false" title="Toggle dark mode">🌙 Dark</button>
-      <label for="langSelect">Language:</label>
-      <select id="langSelect">
+    <h1>Emotional Wellness Tracker</h1>
+    <nav aria-label="Main navigation">
+      <button id="themeToggle" aria-pressed="false" aria-label="Toggle dark/light mode"></button>
+      <select id="langSelect" aria-label="Select language">
         <option value="en">English</option>
         <option value="es">Español</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="pt">Português</option>
       </select>
-      <button onclick="exportData()">Export</button>
-      <label for="importFile" style="margin:0;">Import:</label>
-      <input type="file" id="importFile" accept=".json" style="width:auto;" onchange="importDataFile(this)">
-      <button onclick="syncCloud()">Cloud Sync</button>
-    </div>
-    <div id="toast" role="status" aria-live="polite"></div>
-    <div id="importPreviewContainer"></div>
+    </nav>
   </header>
+
   <main>
-    <section>
-      <h2>Track Your Day</h2>
-      <form id="track-form" autocomplete="off">
-        <div style="display:flex;gap:1em;flex-wrap:wrap;">
-          <div>
-            <label for="bp">Blood Pressure (e.g., 120/80):</label>
-            <input type="text" id="bp" required pattern="\\d{2,3}/\\d{2,3}" title="Format: 120/80">
-          </div>
-          <div>
-            <label for="weight">Weight (kg):</label>
-            <input type="number" id="weight" required min="10" max="300" step="0.1">
-          </div>
-          <div>
-            <label>Physical State:</label>
-            <span class="hearts">
-              <span class="heart" aria-label="Poor" tabindex="0" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128148;</span>
-              <span class="heart" aria-label="Below average" tabindex="0" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128156;</span>
-              <span class="heart" aria-label="Average" tabindex="0" aria-selected="true" style="color:#e67e22;" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128154;</span>
-              <span class="heart" aria-label="Good" tabindex="0" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128155;</span>
-              <span class="heart" aria-label="Excellent" tabindex="0" onclick="selectHeart(this)" onkeydown="if(event.key==='Enter'||event.key===' ')selectHeart(this)">&#128153;</span>
-            </span>
-          </div>
-        </div>
-        <div style="margin:1em 0 0.5em 0;">
-          <label for="thoughts">Notes/Thoughts (optional):</label>
-          <input type="text" id="thoughts" maxlength="240" style="width:60%;">
-        </div>
-        <div>
-          <label>Emotion:</label>
-          <span id="selected-emotion" style="display:inline-block;font-weight:bold;color:#f1c40f;margin-right:1em;">Neutral</span>
-          <svg id="emotion-wheel" width="320" height="320" role="listbox" aria-label="Emotion Wheel" style="vertical-align: middle;"></svg>
-        </div>
-        <button type="submit" style="margin-top:1em;">Log Entry</button>
-      </form>
+    <form id="entryForm" aria-labelledby="entryFormTitle">
+      <h2 id="entryFormTitle">Log Today’s Emotion</h2>
+      <section>
+        <label for="emotionSelect">Emotion</label>
+        <select id="emotionSelect" required aria-required="true"></select>
+        <button type="button" id="addEmotionBtn" aria-label="Add custom emotion">+</button>
+      </section>
+      <section>
+        <label for="noteInput">Notes</label>
+        <textarea id="noteInput" rows="2" maxlength="250" aria-describedby="noteHelp"></textarea>
+        <small id="noteHelp">Max 250 characters.</small>
+      </section>
+      <section>
+        <label for="activityTags">Activity Tags</label>
+        <div id="activityTags" role="list"></div>
+        <input type="text" id="tagInput" maxlength="20" aria-label="New activity tag">
+        <button type="button" id="addTagBtn" aria-label="Add activity tag">+</button>
+      </section>
+      <section>
+        <label for="bpInput">Blood Pressure <span aria-hidden="true">(Optional)</span></label>
+        <input id="bpInput" name="bp" type="text" pattern="^(\d{2,3})\/(\d{2,3})$" maxlength="7" aria-describedby="bpHelp">
+        <small id="bpHelp">Format: 120/80</small>
+      </section>
+      <button type="submit">Save Entry</button>
+    </form>
+
+    <section id="entriesSection" aria-labelledby="entriesTitle">
+      <h2 id="entriesTitle">Entries</h2>
+      <ul id="entriesList" role="list"></ul>
     </section>
-    <section>
-      <h2>Activity Tags</h2>
-      <div id="activity-tags" style="margin-bottom:0.5em;"></div>
-      <input type="text" id="newTagName" placeholder="Add new tag" maxlength="16">
-      <button onclick="addActivityTag()">Add Tag</button>
-    </section>
-    <section>
-      <h2>Recent Entries</h2>
-      <ul id="emotionList"></ul>
-    </section>
-    <section>
-      <h2>Mood Trend Chart</h2>
-      <canvas id="emotionTrendChart" width="600" height="280" aria-label="Mood trend chart" role="img"></canvas>
-      <div style="margin-top:0.6em;">
-        <button onclick="zoomChart('in')">Zoom In</button>
-        <button onclick="zoomChart('out')">Zoom Out</button>
-        <button onclick="zoomChart('reset')">Reset Zoom</button>
-      </div>
-    </section>
-    <section>
-      <h2>Add Custom Emotion</h2>
-      <input type="text" id="newEmotionName" placeholder="Emotion name" maxlength="18">
-      <input type="color" id="newEmotionColor" value="#888888">
-      <button onclick="addEmotion()">Add Emotion</button>
+
+    <section id="statsSection" aria-labelledby="statsTitle">
+      <h2 id="statsTitle">Emotion Chart</h2>
+      <canvas id="emotionChart" width="400" height="200" aria-label="Emotion chart" role="img"></canvas>
     </section>
   </main>
-  <script>
-    // Heart selection for Physical State
-    function selectHeart(el) {
-      document.querySelectorAll('.hearts .heart').forEach(h => h.setAttribute('aria-selected', 'false'));
-      el.setAttribute('aria-selected', 'true');
-    }
-  </script>
-  <!-- Insert all of script.js below -->
-  <script>
-    // ---- Accessibility and Theme/Language Controls ----
-    document.addEventListener('DOMContentLoaded', function() {
-      // Theme selection and persistence
-      const themeSelect = document.getElementById('themeSelect');
-      const savedTheme = localStorage.getItem('ewt_theme');
-      if (savedTheme) {
-        themeSelect.value = savedTheme;
-        document.body.classList.add(savedTheme);
-      }
-      themeSelect.addEventListener('change', function() {
-        document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
-        if (this.value) document.body.classList.add(this.value);
-        localStorage.setItem('ewt_theme', this.value);
-        showToast('Theme changed');
-      });
-      // Live preview of themes
-      themeSelect.addEventListener('mouseover', function(e) {
-        if (e.target.tagName === 'OPTION' && e.target.value)
-          document.body.classList.add(e.target.value);
-      });
-      themeSelect.addEventListener('mouseout', function(e) {
-        if (e.target.tagName === 'OPTION' && e.target.value)
-          document.body.classList.remove(e.target.value);
-      });
 
-      // Dark mode toggle
-      const darkToggle = document.getElementById('darkToggle');
-      darkToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        darkToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-        localStorage.setItem('ewt_dark', isDark ? '1' : '');
-        showToast('Dark mode ' + (isDark ? 'enabled' : 'disabled'));
-      });
-      if (localStorage.getItem('ewt_dark')) document.body.classList.add('dark-mode');
+  <footer>
+    <button id="exportBtn">Export Data</button>
+    <button id="importBtn">Import Data</button>
+    <input type="file" id="importFile" accept=".json" hidden>
+    <a id="installBtn" hidden rel="noopener">Install App</a>
+    <small>&copy; 2025 asilva777 - <a href="https://github.com/asilva777/emotional-wellness-tracker" rel="noopener">GitHub</a></small>
+  </footer>
 
-      // Language selection (placeholder)
-      const langSelect = document.getElementById('langSelect');
-      langSelect.addEventListener('change', function() {
-        // TODO: Integrate an i18n library or your translations here
-        showToast('Language switched: ' + langSelect.options[langSelect.selectedIndex].text);
-      });
+  <div id="toast" role="status" aria-live="polite"></div>
 
-      // Keyboard Accessibility: Ensure tabindex
-      document.querySelectorAll('button, [tabindex="0"], input, select, textarea').forEach(el => {
-        el.setAttribute('tabindex', '0');
-      });
-
-      // Initialize core UI
-      renderTags();
-      drawEmotionWheel();
-      renderEntries();
-      renderTrendLineChart();
-
-      // Form validation
-      document.getElementById('track-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        let valid = true;
-        const bp = document.getElementById('bp');
-        const weight = document.getElementById('weight');
-        // BP format: 120/80
-        if (!/^\d{2,3}\/\d{2,3}$/.test(bp.value)) {
-          valid = false;
-          showToast('Blood pressure must be in format 120/80.', true);
-          bp.setAttribute('aria-invalid', 'true');
-          bp.focus();
-        } else {
-          bp.setAttribute('aria-invalid', 'false');
-        }
-        if (weight.value < 10 || weight.value > 300) {
-          valid = false;
-          showToast('Weight must be between 10 and 300 kg.', true);
-          weight.setAttribute('aria-invalid', 'true');
-          weight.focus();
-        } else {
-          weight.setAttribute('aria-invalid', 'false');
-        }
-        if (valid) {
-          // Save entry
-          saveEntry();
-        }
-      });
-    });
-
-    // ---- Toast feedback ----
-    function showToast(message, isError = false) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.style.background = isError ? '#e74c3c' : '#2ecc71';
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3500);
-    }
-
-    // ---- Export/Import/Cloud Sync ----
-    async function importDataFile(input) {
-      const file = input.files[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const data = JSON.parse(text);
-        const previewContainer = document.getElementById('importPreviewContainer');
-        previewContainer.innerHTML = `
-          <div class="import-preview">
-            <h3>Preview Import Data</h3>
-            <pre style="max-height:200px;overflow:auto;background:#eee">${JSON.stringify(data, null, 2)}</pre>
-            <button id="confirmImportBtn">Confirm Import</button>
-            <button id="cancelImportBtn">Cancel</button>
-          </div>
-        `;
-        document.getElementById('confirmImportBtn').onclick = () => {
-          if (data.emotions) localStorage.setItem('emotions', data.emotions);
-          if (data.emotionsList) localStorage.setItem('emotionsList', data.emotionsList);
-          if (data.activityTags) localStorage.setItem('activityTags', data.activityTags);
-          renderTags();
-          drawEmotionWheel();
-          renderEntries();
-          renderTrendLineChart();
-          showToast("Data imported!");
-          previewContainer.innerHTML = '';
-        };
-        document.getElementById('cancelImportBtn').onclick = () => previewContainer.innerHTML = '';
-      } catch (err) {
-        showToast("Invalid import file.", true);
-      }
-    }
-
-    function exportData() {
-      const data = {
-        emotions: localStorage.getItem('emotions') || "[]",
-        emotionsList: localStorage.getItem('emotionsList') || "[]",
-        activityTags: localStorage.getItem('activityTags') || "[]"
-      };
-      const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = "emotional-wellness-data.json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      showToast("Data exported!");
-    }
-
-    function syncCloud() {
-      // Placeholder for cloud sync logic (Google Drive API, Dropbox API, etc.)
-      showToast("Cloud sync coming soon!");
-    }
-
-    // ---- Entries and Tags ----
-    function saveEntry() {
-      const bp = document.getElementById('bp').value;
-      const weight = document.getElementById('weight').value;
-      const thoughts = document.getElementById('thoughts').value;
-      const emotion = document.getElementById('selected-emotion').textContent || "Neutral";
-      const physical = document.querySelector('.hearts .heart[aria-selected="true"]')?.getAttribute('aria-label') || "Average";
-      const date = new Date().toISOString().substr(0, 10);
-
-      let emotions = JSON.parse(localStorage.getItem('emotions') || "[]");
-      emotions.push({date, emotion, physical, bp, weight, thoughts});
-      localStorage.setItem('emotions', JSON.stringify(emotions));
-      renderEntries();
-      renderTrendLineChart();
-      showToast("Entry logged!");
-    }
-
-    function renderEntries() {
-      const entries = JSON.parse(localStorage.getItem('emotions') || "[]");
-      const list = document.getElementById('emotionList');
-      if (!list) return;
-      list.innerHTML = '';
-      entries.slice(-20).reverse().forEach(entry => {
-        const li = document.createElement('li');
-        li.innerHTML = `<b>${entry.date}</b>: <span>${entry.emotion}</span>
-          <small style="color:#888;">[BP: ${entry.bp}, Wt: ${entry.weight}kg, Phys: ${entry.physical}]</small>
-          <span style="flex:1"></span>
-          <em style="color:#555;">${entry.thoughts || ''}</em>`;
-        list.appendChild(li);
-      });
-    }
-
-    function renderTags() {
-      const tagData = JSON.parse(localStorage.getItem('activityTags') || "[]");
-      const tagBox = document.getElementById('activity-tags');
-      if (!tagBox) return;
-      tagBox.innerHTML = '';
-      tagData.forEach(tag => {
-        const span = document.createElement('span');
-        span.className = 'tag';
-        span.textContent = tag;
-        span.tabIndex = 0;
-        span.setAttribute('role', 'option');
-        span.setAttribute('aria-label', tag);
-        tagBox.appendChild(span);
-      });
-    }
-
-    function addActivityTag() {
-      const input = document.getElementById('newTagName');
-      const value = input.value.trim();
-      if (!value) return;
-      let tagData = JSON.parse(localStorage.getItem('activityTags') || "[]");
-      if (!tagData.includes(value)) {
-        tagData.push(value);
-        localStorage.setItem('activityTags', JSON.stringify(tagData));
-        renderTags();
-        showToast('Activity tag added!');
-      }
-      input.value = '';
-    }
-
-    // ---- Emotion Wheel ----
-    function drawEmotionWheel() {
-      const svg = document.getElementById('emotion-wheel');
-      if (!svg) return;
-      svg.innerHTML = ''; // Clear previous
-      // Example wheel with 5 emotions
-      const emotions = [
-        { label: 'Very sad', color: '#8e44ad' },
-        { label: 'Sad', color: '#3498db' },
-        { label: 'Neutral', color: '#f1c40f' },
-        { label: 'Happy', color: '#2ecc71' },
-        { label: 'Very happy', color: '#e67e22' }
-      ];
-      const radius = 140, cx = 160, cy = 160;
-      const angle = 2 * Math.PI / emotions.length;
-      emotions.forEach((emo, i) => {
-        const start = angle * i;
-        const end = angle * (i + 1);
-        const x1 = cx + radius * Math.cos(start);
-        const y1 = cy + radius * Math.sin(start);
-        const x2 = cx + radius * Math.cos(end);
-        const y2 = cy + radius * Math.sin(end);
-        const largeArcFlag = angle > Math.PI ? 1 : 0;
-        const d = `
-          M ${cx} ${cy}
-          L ${x1} ${y1}
-          A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
-          Z
-        `;
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', d);
-        path.setAttribute('fill', emo.color);
-        path.setAttribute('tabindex', '0');
-        path.setAttribute('aria-label', emo.label);
-        path.setAttribute('role', 'option');
-        path.addEventListener('click', () => selectEmotion(emo.label, emo.color));
-        path.addEventListener('keydown', e => {
-          if (e.key === 'Enter' || e.key === ' ') selectEmotion(emo.label, emo.color);
-        });
-        svg.appendChild(path);
-        // Add emotion label
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        const tx = cx + (radius - 40) * Math.cos(start + angle / 2);
-        const ty = cy + (radius - 40) * Math.sin(start + angle / 2);
-        text.setAttribute('x', tx);
-        text.setAttribute('y', ty);
-        text.setAttribute('fill', '#23272f');
-        text.setAttribute('font-size', '1.1em');
-        text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('alignment-baseline', 'central');
-        text.textContent = emo.label;
-        svg.appendChild(text);
-      });
-    }
-    function selectEmotion(label, color) {
-      const sel = document.getElementById('selected-emotion');
-      sel.textContent = label;
-      sel.style.color = color;
-      showToast('Emotion selected: ' + label);
-    }
-
-    // ---- Mood Trend Chart ----
-    function renderTrendLineChart() {
-      if (!window.Chart) return;
-      const ctx = document.getElementById('emotionTrendChart').getContext('2d');
-      const emotions = JSON.parse(localStorage.getItem('emotions') || "[]");
-      const moodOrder = ["Very sad", "Sad", "Neutral", "Happy", "Very happy"];
-      const dateMap = {};
-      emotions.forEach(entry => {
-        if (!dateMap[entry.date]) dateMap[entry.date] = [];
-        dateMap[entry.date].push(entry.emotion);
-      });
-      const labels = Object.keys(dateMap).sort();
-      const data = labels.map(date => {
-        const moods = dateMap[date];
-        if (!moods.length) return null;
-        const avg = moods.map(m => moodOrder.indexOf(m)).reduce((a, b) => a + b, 0) / moods.length;
-        return avg;
-      });
-      if (window.emotionTrendChartObj) window.emotionTrendChartObj.destroy();
-      window.emotionTrendChartObj = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Average Mood',
-            data,
-            borderColor: '#3e95cd',
-            fill: false,
-            tension: 0.2,
-            pointBackgroundColor: '#fff',
-            pointRadius: 4,
-          }]
-        },
-        options: {
-          plugins: {
-            title: { display: true, text: 'Mood Trends Over Time' },
-            tooltip: { enabled: true },
-          },
-          scales: {
-            y: {
-              min: 0,
-              max: moodOrder.length - 1,
-              ticks: {
-                callback: value => moodOrder[value] || ''
-              }
-            }
-          },
-          interaction: {
-            mode: 'nearest',
-            intersect: false
-          }
-        }
-      });
-    }
-
-    function zoomChart(direction) {
-      if (!window.emotionTrendChartObj) return;
-      let yScale = window.emotionTrendChartObj.options.scales.y;
-      if (direction === 'in') {
-        yScale.max = Math.max(1, yScale.max - 1);
-        yScale.min = Math.min(yScale.max - 1, yScale.min + 1);
-      } else if (direction === 'out') {
-        yScale.max += 1;
-        yScale.min = Math.max(0, yScale.min - 1);
-      } else if (direction === 'reset') {
-        yScale.min = 0;
-        yScale.max = 4;
-      }
-      window.emotionTrendChartObj.update();
-    }
-
-    // ---- Add Emotion ----
-    function addEmotion() {
-      const nameInput = document.getElementById('newEmotionName');
-      const colorInput = document.getElementById('newEmotionColor');
-      const name = nameInput.value.trim();
-      const color = colorInput.value;
-      if (!name) {
-        showToast('Emotion name required.', true);
-        return;
-      }
-      let emotionsList = JSON.parse(localStorage.getItem('emotionsList') || "[]");
-      if (!emotionsList.find(e => e.name === name)) {
-        emotionsList.push({ name, color });
-        localStorage.setItem('emotionsList', JSON.stringify(emotionsList));
-        showToast('New emotion added!');
-        drawEmotionWheel();
-      } else {
-        showToast('Emotion already exists.', true);
-      }
-      nameInput.value = '';
-      colorInput.value = '#888888';
-    }
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
