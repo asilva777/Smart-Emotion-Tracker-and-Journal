@@ -1,363 +1,360 @@
-// ---- Accessibility and Theme/Language Controls ----
-document.addEventListener('DOMContentLoaded', function() {
-  // Theme selection and persistence
-  const themeSelect = document.getElementById('themeSelect');
-  const savedTheme = localStorage.getItem('ewt_theme');
-  if (savedTheme) {
-    themeSelect.value = savedTheme;
-    document.body.classList.add(savedTheme);
+// Dynamic language translations (expand as needed)
+const translations = {
+  en: {
+    emotion: "Emotion",
+    notes: "Notes",
+    activityTags: "Activity Tags",
+    add: "Add",
+    save: "Save Entry",
+    entries: "Entries",
+    emotionChart: "Emotion Chart",
+    exportData: "Export Data",
+    importData: "Import Data",
+    install: "Install App",
+    addCustomEmotion: "Add custom emotion",
+    delete: "Delete",
+    maxChars: "Max 250 characters.",
+    bp: "Blood Pressure",
+    bpFormat: "Format: 120/80",
+    entrySaved: "Entry saved!",
+    entryDeleted: "Entry deleted.",
+    tagAdded: "Tag added.",
+    tagDeleted: "Tag removed.",
+    emotionAdded: "Emotion added.",
+    emotionExists: "Emotion already exists.",
+    importSuccess: "Data imported!",
+    exportSuccess: "Data exported.",
+    error: "Error",
+    invalidBP: "Blood pressure must be in format 120/80.",
+    installPrompt: "Install this app on your device.",
+    installSuccess: "App installed!",
+    installDismissed: "Install dismissed."
+  },
+  es: {
+    emotion: "Emoción",
+    notes: "Notas",
+    activityTags: "Etiquetas de actividad",
+    add: "Añadir",
+    save: "Guardar entrada",
+    entries: "Entradas",
+    emotionChart: "Gráfico de emociones",
+    exportData: "Exportar datos",
+    importData: "Importar datos",
+    install: "Instalar App",
+    addCustomEmotion: "Añadir emoción personalizada",
+    delete: "Eliminar",
+    maxChars: "Máx. 250 caracteres.",
+    bp: "Presión arterial",
+    bpFormat: "Formato: 120/80",
+    entrySaved: "¡Entrada guardada!",
+    entryDeleted: "Entrada eliminada.",
+    tagAdded: "Etiqueta añadida.",
+    tagDeleted: "Etiqueta eliminada.",
+    emotionAdded: "Emoción añadida.",
+    emotionExists: "La emoción ya existe.",
+    importSuccess: "¡Datos importados!",
+    exportSuccess: "Datos exportados.",
+    error: "Error",
+    invalidBP: "La presión debe tener formato 120/80.",
+    installPrompt: "Instala esta app en tu dispositivo.",
+    installSuccess: "¡App instalada!",
+    installDismissed: "Instalación cancelada."
   }
-  themeSelect.addEventListener('change', function() {
-    document.body.className = document.body.className.replace(/theme-\w+/g, '').trim();
-    if (this.value) document.body.classList.add(this.value);
-    localStorage.setItem('ewt_theme', this.value);
-    showToast('Theme changed');
-  });
-  // Live preview of themes
-  themeSelect.addEventListener('mouseover', function(e) {
-    if (e.target.tagName === 'OPTION' && e.target.value)
-      document.body.classList.add(e.target.value);
-  });
-  themeSelect.addEventListener('mouseout', function(e) {
-    if (e.target.tagName === 'OPTION' && e.target.value)
-      document.body.classList.remove(e.target.value);
-  });
+};
 
-  // Dark mode toggle
-  const darkToggle = document.getElementById('darkToggle');
-  darkToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    darkToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-    localStorage.setItem('ewt_dark', isDark ? '1' : '');
-    showToast('Dark mode ' + (isDark ? 'enabled' : 'disabled'));
-  });
-  if (localStorage.getItem('ewt_dark')) document.body.classList.add('dark-mode');
+let lang = localStorage.getItem('lang') || 'en';
+let emotions = JSON.parse(localStorage.getItem('emotions')) || [
+  "Happy", "Sad", "Angry", "Relaxed", "Anxious", "Excited", "Tired"
+];
+let tags = JSON.parse(localStorage.getItem('tags')) || [];
+let entries = JSON.parse(localStorage.getItem('entries')) || [];
+let customTheme = JSON.parse(localStorage.getItem('theme')) || "auto";
+let deferredPrompt = null;
 
-  // Language selection (placeholder)
-  const langSelect = document.getElementById('langSelect');
-  langSelect.addEventListener('change', function() {
-    // TODO: Integrate an i18n library or your translations here
-    showToast('Language switched: ' + langSelect.options[langSelect.selectedIndex].text);
-  });
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
 
-  // Keyboard Accessibility: Ensure tabindex
-  document.querySelectorAll('button, [tabindex="0"], input, select, textarea').forEach(el => {
-    el.setAttribute('tabindex', '0');
-  });
-
-  // Initialize core UI
-  renderTags();
-  drawEmotionWheel();
-  renderEntries();
-  renderTrendLineChart();
-
-  // Form validation
-  document.getElementById('track-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    let valid = true;
-    const bp = document.getElementById('bp');
-    const weight = document.getElementById('weight');
-    // BP format: 120/80
-    if (!/^\d{2,3}\/\d{2,3}$/.test(bp.value)) {
-      valid = false;
-      showToast('Blood pressure must be in format 120/80.', true);
-      bp.setAttribute('aria-invalid', 'true');
-      bp.focus();
-    } else {
-      bp.setAttribute('aria-invalid', 'false');
-    }
-    if (weight.value < 10 || weight.value > 300) {
-      valid = false;
-      showToast('Weight must be between 10 and 300 kg.', true);
-      weight.setAttribute('aria-invalid', 'true');
-      weight.focus();
-    } else {
-      weight.setAttribute('aria-invalid', 'false');
-    }
-    if (valid) {
-      // Save entry
-      saveEntry();
-    }
-  });
-});
-
-// ---- Toast feedback ----
-function showToast(message, isError = false) {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.style.background = isError ? '#e74c3c' : '#2ecc71';
-  toast.style.display = 'block';
-  setTimeout(() => { toast.style.display = 'none'; }, 3500);
+function t(key) {
+  return translations[lang][key] || key;
 }
 
-// ---- Export/Import/Cloud Sync ----
-async function importDataFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    const previewContainer = document.getElementById('importPreviewContainer');
-    previewContainer.innerHTML = `
-      <div class="import-preview">
-        <h3>Preview Import Data</h3>
-        <pre style="max-height:200px;overflow:auto;background:#eee">${JSON.stringify(data, null, 2)}</pre>
-        <button id="confirmImportBtn">Confirm Import</button>
-        <button id="cancelImportBtn">Cancel</button>
-      </div>
-    `;
-    document.getElementById('confirmImportBtn').onclick = () => {
-      if (data.emotions) localStorage.setItem('emotions', data.emotions);
-      if (data.emotionsList) localStorage.setItem('emotionsList', data.emotionsList);
-      if (data.activityTags) localStorage.setItem('activityTags', data.activityTags);
-      renderTags();
-      drawEmotionWheel();
-      renderEntries();
-      renderTrendLineChart();
-      showToast("Data imported!");
-      previewContainer.innerHTML = '';
-    };
-    document.getElementById('cancelImportBtn').onclick = () => previewContainer.innerHTML = '';
-  } catch (err) {
-    showToast("Invalid import file.", true);
-  }
+function setLang(newLang) {
+  lang = newLang;
+  localStorage.setItem('lang', lang);
+  updateTexts();
 }
 
-function exportData() {
-  const data = {
-    emotions: localStorage.getItem('emotions') || "[]",
-    emotionsList: localStorage.getItem('emotionsList') || "[]",
-    activityTags: localStorage.getItem('activityTags') || "[]"
-  };
-  const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = "emotional-wellness-data.json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  showToast("Data exported!");
+function updateTexts() {
+  $('#emotionSelect').previousElementSibling.textContent = t('emotion');
+  $('#noteInput').previousElementSibling.textContent = t('notes');
+  $('#activityTags').previousElementSibling.textContent = t('activityTags');
+  $('#addTagBtn').textContent = t('add');
+  $('#addEmotionBtn').ariaLabel = t('addCustomEmotion');
+  $('#bpInput').previousElementSibling.textContent = t('bp');
+  $('#bpHelp').textContent = t('bpFormat');
+  $('#noteHelp').textContent = t('maxChars');
+  $('#entryFormTitle').textContent = t('save');
+  $('#entriesTitle').textContent = t('entries');
+  $('#statsTitle').textContent = t('emotionChart');
+  $('#exportBtn').textContent = t('exportData');
+  $('#importBtn').textContent = t('importData');
+  $('#installBtn').textContent = t('install');
 }
 
-function syncCloud() {
-  // Placeholder for cloud sync logic (Google Drive API, Dropbox API, etc.)
-  showToast("Cloud sync coming soon!");
-}
-
-// ---- Entries and Tags ----
-function saveEntry() {
-  const bp = document.getElementById('bp').value;
-  const weight = document.getElementById('weight').value;
-  const thoughts = document.getElementById('thoughts').value;
-  const emotion = document.getElementById('selected-emotion').textContent || "Neutral";
-  const physical = document.querySelector('.hearts .heart[aria-selected="true"]')?.getAttribute('aria-label') || "Average";
-  const date = new Date().toISOString().substr(0, 10);
-
-  let emotions = JSON.parse(localStorage.getItem('emotions') || "[]");
-  emotions.push({date, emotion, physical, bp, weight, thoughts});
-  localStorage.setItem('emotions', JSON.stringify(emotions));
-  renderEntries();
-  renderTrendLineChart();
-  showToast("Entry logged!");
-}
-
-function renderEntries() {
-  const entries = JSON.parse(localStorage.getItem('emotions') || "[]");
-  const list = document.getElementById('emotionList');
-  if (!list) return;
-  list.innerHTML = '';
-  entries.slice(-20).reverse().forEach(entry => {
-    const li = document.createElement('li');
-    li.innerHTML = `<b>${entry.date}</b>: <span>${entry.emotion}</span>
-      <small style="color:#888;">[BP: ${entry.bp}, Wt: ${entry.weight}kg, Phys: ${entry.physical}]</small>
-      <span style="flex:1"></span>
-      <em style="color:#555;">${entry.thoughts || ''}</em>`;
-    list.appendChild(li);
+function renderEmotions() {
+  const select = $('#emotionSelect');
+  select.innerHTML = "";
+  emotions.forEach(e => {
+    const option = document.createElement('option');
+    option.value = e;
+    option.textContent = e;
+    select.appendChild(option);
   });
 }
 
 function renderTags() {
-  const tagData = JSON.parse(localStorage.getItem('activityTags') || "[]");
-  const tagBox = document.getElementById('activity-tags');
-  if (!tagBox) return;
-  tagBox.innerHTML = '';
-  tagData.forEach(tag => {
-    const span = document.createElement('span');
-    span.className = 'tag';
-    span.textContent = tag;
-    span.tabIndex = 0;
-    span.setAttribute('role', 'option');
-    span.setAttribute('aria-label', tag);
-    tagBox.appendChild(span);
+  const tagsDiv = $('#activityTags');
+  tagsDiv.innerHTML = '';
+  tags.forEach((tag, idx) => {
+    const tagEl = document.createElement('span');
+    tagEl.className = 'tag';
+    tagEl.textContent = tag;
+    tagEl.setAttribute('role', 'listitem');
+    const delBtn = document.createElement('button');
+    delBtn.type = "button";
+    delBtn.ariaLabel = `${t('delete')} ${tag}`;
+    delBtn.textContent = '×';
+    delBtn.onclick = () => removeTag(idx);
+    tagEl.appendChild(delBtn);
+    tagsDiv.appendChild(tagEl);
   });
 }
 
-function addActivityTag() {
-  const input = document.getElementById('newTagName');
-  const value = input.value.trim();
-  if (!value) return;
-  let tagData = JSON.parse(localStorage.getItem('activityTags') || "[]");
-  if (!tagData.includes(value)) {
-    tagData.push(value);
-    localStorage.setItem('activityTags', JSON.stringify(tagData));
-    renderTags();
-    showToast('Activity tag added!');
+function renderEntries() {
+  const ul = $('#entriesList');
+  ul.innerHTML = '';
+  if (entries.length === 0) {
+    const li = document.createElement('li');
+    li.textContent = '—';
+    ul.appendChild(li);
+    return;
   }
-  input.value = '';
-}
-
-// ---- Emotion Wheel ----
-function drawEmotionWheel() {
-  const svg = document.getElementById('emotion-wheel');
-  if (!svg) return;
-  svg.innerHTML = ''; // Clear previous
-  // Example wheel with 5 emotions
-  const emotions = [
-    { label: 'Very sad', color: '#8e44ad' },
-    { label: 'Sad', color: '#3498db' },
-    { label: 'Neutral', color: '#f1c40f' },
-    { label: 'Happy', color: '#2ecc71' },
-    { label: 'Very happy', color: '#e67e22' }
-  ];
-  const radius = 140, cx = 160, cy = 160;
-  const angle = 2 * Math.PI / emotions.length;
-  emotions.forEach((emo, i) => {
-    const start = angle * i;
-    const end = angle * (i + 1);
-    const x1 = cx + radius * Math.cos(start);
-    const y1 = cy + radius * Math.sin(start);
-    const x2 = cx + radius * Math.cos(end);
-    const y2 = cy + radius * Math.sin(end);
-    const largeArcFlag = angle > Math.PI ? 1 : 0;
-    const d = `
-      M ${cx} ${cy}
-      L ${x1} ${y1}
-      A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
-      Z
+  entries.slice().reverse().forEach((entry, idx) => {
+    const li = document.createElement('li');
+    li.className = 'entry';
+    li.tabIndex = 0;
+    li.innerHTML = `
+      <strong>${entry.emotion}</strong> ${entry.bp ? `<span>(${entry.bp})</span>` : ''}
+      <p>${entry.note || ''}</p>
+      <div>
+        ${(entry.tags || []).map(t => `<span class="tag">${t}</span>`).join(' ')}
+      </div>
+      <small>${new Date(entry.time).toLocaleString()}</small>
+      <button type="button" class="removeEntryBtn" aria-label="${t('delete')}" title="${t('delete')}">×</button>
     `;
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', d);
-    path.setAttribute('fill', emo.color);
-    path.setAttribute('tabindex', '0');
-    path.setAttribute('aria-label', emo.label);
-    path.setAttribute('role', 'option');
-    path.addEventListener('click', () => selectEmotion(emo.label, emo.color));
-    path.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') selectEmotion(emo.label, emo.color);
-    });
-    svg.appendChild(path);
-    // Add emotion label
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    const tx = cx + (radius - 40) * Math.cos(start + angle / 2);
-    const ty = cy + (radius - 40) * Math.sin(start + angle / 2);
-    text.setAttribute('x', tx);
-    text.setAttribute('y', ty);
-    text.setAttribute('fill', '#23272f');
-    text.setAttribute('font-size', '1.1em');
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('alignment-baseline', 'central');
-    text.textContent = emo.label;
-    svg.appendChild(text);
+    li.querySelector('.removeEntryBtn').onclick = () => removeEntry(entries.length - idx - 1);
+    ul.appendChild(li);
   });
-}
-function selectEmotion(label, color) {
-  const sel = document.getElementById('selected-emotion');
-  sel.textContent = label;
-  sel.style.color = color;
-  showToast('Emotion selected: ' + label);
 }
 
-// ---- Mood Trend Chart ----
-function renderTrendLineChart() {
+function renderChart() {
+  const ctx = $('#emotionChart');
   if (!window.Chart) return;
-  const ctx = document.getElementById('emotionTrendChart').getContext('2d');
-  const emotions = JSON.parse(localStorage.getItem('emotions') || "[]");
-  const moodOrder = ["Very sad", "Sad", "Neutral", "Happy", "Very happy"];
-  const dateMap = {};
-  emotions.forEach(entry => {
-    if (!dateMap[entry.date]) dateMap[entry.date] = [];
-    dateMap[entry.date].push(entry.emotion);
+  const emotionCount = {};
+  entries.forEach(e => {
+    emotionCount[e.emotion] = (emotionCount[e.emotion] || 0) + 1;
   });
-  const labels = Object.keys(dateMap).sort();
-  const data = labels.map(date => {
-    const moods = dateMap[date];
-    if (!moods.length) return null;
-    const avg = moods.map(m => moodOrder.indexOf(m)).reduce((a, b) => a + b, 0) / moods.length;
-    return avg;
-  });
-  if (window.emotionTrendChartObj) window.emotionTrendChartObj.destroy();
-  window.emotionTrendChartObj = new Chart(ctx, {
-    type: 'line',
+  if (window.emotionChartInstance) window.emotionChartInstance.destroy();
+  window.emotionChartInstance = new Chart(ctx, {
+    type: 'bar',
     data: {
-      labels,
+      labels: Object.keys(emotionCount),
       datasets: [{
-        label: 'Average Mood',
-        data,
-        borderColor: '#3e95cd',
-        fill: false,
-        tension: 0.2,
-        pointBackgroundColor: '#fff',
-        pointRadius: 4,
+        label: t('emotion'),
+        data: Object.values(emotionCount),
+        backgroundColor: Object.keys(emotionCount).map(() => "#4a90e2")
       }]
     },
     options: {
-      plugins: {
-        title: { display: true, text: 'Mood Trends Over Time' },
-        tooltip: { enabled: true },
-      },
-      scales: {
-        y: {
-          min: 0,
-          max: moodOrder.length - 1,
-          ticks: {
-            callback: value => moodOrder[value] || ''
-          }
-        }
-      },
-      interaction: {
-        mode: 'nearest',
-        intersect: false
-      }
+      responsive: true,
+      plugins: { legend: { display: false } }
     }
   });
 }
 
-function zoomChart(direction) {
-  if (!window.emotionTrendChartObj) return;
-  let yScale = window.emotionTrendChartObj.options.scales.y;
-  if (direction === 'in') {
-    yScale.max = Math.max(1, yScale.max - 1);
-    yScale.min = Math.min(yScale.max - 1, yScale.min + 1);
-  } else if (direction === 'out') {
-    yScale.max += 1;
-    yScale.min = Math.max(0, yScale.min - 1);
-  } else if (direction === 'reset') {
-    yScale.min = 0;
-    yScale.max = 4;
-  }
-  window.emotionTrendChartObj.update();
+function showToast(msg, error = false) {
+  const toast = $('#toast');
+  toast.textContent = msg;
+  toast.className = 'show';
+  toast.style.background = error ? 'var(--error)' : 'var(--primary)';
+  setTimeout(() => { toast.className = ''; }, 2200);
 }
 
-// ---- Add Emotion ----
-function addEmotion() {
-  const nameInput = document.getElementById('newEmotionName');
-  const colorInput = document.getElementById('newEmotionColor');
-  const name = nameInput.value.trim();
-  const color = colorInput.value;
-  if (!name) {
-    showToast('Emotion name required.', true);
-    return;
-  }
-  let emotionsList = JSON.parse(localStorage.getItem('emotionsList') || "[]");
-  if (!emotionsList.find(e => e.name === name)) {
-    emotionsList.push({ name, color });
-    localStorage.setItem('emotionsList', JSON.stringify(emotionsList));
-    showToast('New emotion added!');
-    drawEmotionWheel();
-  } else {
-    showToast('Emotion already exists.', true);
-  }
-  nameInput.value = '';
-  colorInput.value = '#888888';
+function saveData() {
+  localStorage.setItem('emotions', JSON.stringify(emotions));
+  localStorage.setItem('tags', JSON.stringify(tags));
+  localStorage.setItem('entries', JSON.stringify(entries));
+  localStorage.setItem('theme', JSON.stringify(customTheme));
 }
+
+function addTag() {
+  const val = $('#tagInput').value.trim();
+  if (val && !tags.includes(val)) {
+    tags.push(val);
+    saveData();
+    renderTags();
+    showToast(t('tagAdded'));
+    $('#tagInput').value = '';
+  }
+}
+
+function removeTag(idx) {
+  tags.splice(idx, 1);
+  saveData();
+  renderTags();
+  showToast(t('tagDeleted'));
+}
+
+function addEmotion() {
+  const val = prompt(t('addCustomEmotion'));
+  if (val && !emotions.includes(val)) {
+    emotions.push(val);
+    saveData();
+    renderEmotions();
+    showToast(t('emotionAdded'));
+  } else if (emotions.includes(val)) {
+    showToast(t('emotionExists'), true);
+  }
+}
+
+function addEntry(e) {
+  e.preventDefault();
+  const emotion = $('#emotionSelect').value;
+  const note = $('#noteInput').value.slice(0, 250);
+  const selectedTags = tags.slice();
+  const bp = $('#bpInput').value.trim();
+  let valid = true;
+  $('#bpInput').setAttribute('aria-invalid', "false");
+  if (bp && !/^(\d{2,3})\/(\d{2,3})$/.test(bp)) {
+    showToast(t('invalidBP'), true);
+    $('#bpInput').setAttribute('aria-invalid', "true");
+    valid = false;
+  }
+  if (!valid) return;
+  entries.push({ emotion, note, tags: selectedTags, bp, time: Date.now() });
+  saveData();
+  renderEntries();
+  renderChart();
+  showToast(t('entrySaved'));
+  $('#noteInput').value = '';
+  $('#bpInput').value = '';
+}
+
+function removeEntry(idx) {
+  entries.splice(idx, 1);
+  saveData();
+  renderEntries();
+  renderChart();
+  showToast(t('entryDeleted'));
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify({ entries, tags, emotions })], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "emotional-wellness-data.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(t('exportSuccess'));
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const data = JSON.parse(evt.target.result);
+      if (data.entries) entries = data.entries;
+      if (data.tags) tags = data.tags;
+      if (data.emotions) emotions = data.emotions;
+      saveData();
+      renderTags();
+      renderEmotions();
+      renderEntries();
+      renderChart();
+      showToast(t('importSuccess'));
+    } catch {
+      showToast(t('error'), true);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Theme toggle
+function setTheme(t) {
+  customTheme = t;
+  localStorage.setItem('theme', JSON.stringify(t));
+  if (t === "dark") document.body.classList.add('dark');
+  else if (t === "light") document.body.classList.remove('dark');
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.body.classList.add('dark');
+  else
+    document.body.classList.remove('dark');
+}
+
+function registerSW() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+}
+
+// PWA Install
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  $('#installBtn').hidden = false;
+});
+
+$('#installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === "accepted") showToast(t('installSuccess'));
+  else showToast(t('installDismissed'));
+  deferredPrompt = null;
+  $('#installBtn').hidden = true;
+});
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  $('#langSelect').value = lang;
+  $('#langSelect').onchange = (e) => setLang(e.target.value);
+
+  $('#themeToggle').textContent = '🌗';
+  $('#themeToggle').onclick = () => {
+    const isDark = document.body.classList.toggle('dark');
+    setTheme(isDark ? "dark" : "light");
+    $('#themeToggle').setAttribute('aria-pressed', isDark);
+  };
+  setTheme(customTheme);
+
+  renderEmotions();
+  renderTags();
+  renderEntries();
+  renderChart();
+  updateTexts();
+
+  $('#addTagBtn').onclick = addTag;
+  $('#addEmotionBtn').onclick = addEmotion;
+  $('#entryForm').onsubmit = addEntry;
+  $('#exportBtn').onclick = exportData;
+  $('#importBtn').onclick = () => $('#importFile').click();
+  $('#importFile').onchange = importData;
+
+  registerSW();
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (customTheme === "auto") setTheme("auto");
+  });
+});
