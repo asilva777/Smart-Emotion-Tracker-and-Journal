@@ -1,349 +1,198 @@
-/* ==== Base Styles ==== */
+:root {
+  --primary: #4a90e2;
+  --secondary: #f5f5f5;
+  --text: #222;
+  --accent: #ffd700;
+  --error: #c0392b;
+  --success: #27ae60;
+  --dark-bg: #181c20;
+  --dark-text: #f5f5f5;
+  --header-height: 64px;
+  --border-radius: 8px;
+  --transition: 0.2s;
+}
+
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', 'Oswald', 'Montserrat', Arial, sans-serif;
-  background: #f6f7fb;
-  color: #23272f;
-  min-height: 100vh;
+  font-family: system-ui, sans-serif;
+  background: var(--secondary);
+  color: var(--text);
 }
-header, main {
-  max-width: 840px;
-  margin: auto;
-  padding: 1.5em;
+
+body.dark {
+  background: var(--dark-bg);
+  color: var(--dark-text);
 }
+
 header {
-  background: #2ecc71;
+  background: var(--primary);
   color: #fff;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 2px 8px #0002;
-  margin-bottom: 2em;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: var(--header-height);
 }
+
 header h1 {
-  margin: 0;
-  font-size: 2.1rem;
-  font-weight: 700;
-  letter-spacing: 1px;
+  margin: 0 0 0.5em 0;
 }
-.controls {
+
+nav {
   display: flex;
   gap: 1em;
-  flex-wrap: wrap;
   align-items: center;
-  margin-top: 0.7em;
-}
-label {
-  font-weight: 500;
-  margin-bottom: 0.2em;
-  display: inline-block;
-}
-select, input[type="text"], input[type="number"], input[type="color"], textarea {
-  border: 1.5px solid #bfc9d1;
-  padding: 0.45em 0.8em;
-  border-radius: 5px;
-  font-size: 1em;
-  background: #fff;
-  margin-right: 0.3em;
-  margin-bottom: 0.3em;
-  box-sizing: border-box;
-  transition: border 0.2s;
-}
-input[type="color"] {
-  padding: 0.1em;
-  width: 2.3em;
-  height: 2.3em;
-}
-input:focus, textarea:focus, select:focus {
-  outline: 2px solid #2980b9;
-  border-color: #2980b9;
-}
-input[aria-invalid="true"], textarea[aria-invalid="true"] {
-  border-color: #e74c3c;
-  background: #fff5f5;
-}
-input[type="file"] {
-  display: none;
 }
 
-/* ==== Buttons ==== */
-button, .btn, .btn-secondary {
-  background: #2980b9;
+#themeToggle {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: inherit;
+  cursor: pointer;
+  outline: 2px solid transparent;
+  transition: outline var(--transition);
+}
+#themeToggle:focus {
+  outline: 2px solid var(--accent);
+}
+
+main {
+  max-width: 720px;
+  margin: 2em auto;
+  padding: 1em;
+  background: #fff;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+body.dark main {
+  background: #23272c;
+}
+
+form section {
+  margin-bottom: 1.2em;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4em;
+}
+
+input, select, textarea, button {
+  font-size: 1em;
+  border-radius: var(--border-radius);
+  border: 1px solid #b0b0b0;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--primary);
+}
+button, [type="submit"] {
+  background: var(--primary);
   color: #fff;
   border: none;
-  padding: 0.55em 1.15em;
-  border-radius: 4px;
   cursor: pointer;
-  margin: 0.15em;
-  font-size: 1em;
-  font-weight: 500;
-  transition: background 0.2s, color 0.2s;
+  padding: 0.7em 1.4em;
+  font-weight: 600;
+  margin: 0.3em 0;
+  transition: background var(--transition);
 }
-button:hover, .btn:hover, .btn-secondary:hover {
-  background: #1abc9c;
-  color: #fff;
-}
-button[aria-pressed="true"], .btn[aria-pressed="true"] {
-  background: #34495e;
-  color: #fff;
+button:hover, button:focus {
+  background: #3567a6;
 }
 
-/* ==== Section Styles ==== */
-section {
-  margin-bottom: 2em;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 1px 4px #0001;
-}
-@media (max-width: 700px) {
-  header, main {
-    padding: 0.8em;
-  }
-  section {
-    padding: 1em;
-  }
-}
-
-/* ==== Toast Notification ==== */
-#toast {
-  display: none;
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 1em 2em;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: bold;
-  font-size: 1.1em;
-  min-width: 220px;
-  z-index: 99;
-  background: #2ecc71;
-  box-shadow: 0 2px 10px #0002;
-}
-#toast.error, #toast[style*="#e74c3c"] {
-  background: #e74c3c !important;
-}
-
-/* ==== Tags ==== */
-#activity-tags, .tag-list {
+#activityTags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3em;
   margin-bottom: 0.5em;
 }
 .tag {
-  background: #ecf0f1;
-  border-radius: 14px;
-  padding: 0.25em 0.8em;
-  font-size: 1.07em;
-  margin-bottom: 0.2em;
-  margin-right: 0.2em;
-  display: inline-block;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: background 0.2s, border 0.2s, color 0.2s;
-}
-.tag:focus, .tag[aria-selected="true"] {
-  outline: 2px solid #2980b9;
-  border-color: #2980b9;
-  background: #d6eaff;
-  color: #205;
-}
-
-/* ==== Hearts (Physical State) ==== */
-.hearts {
+  background: var(--accent);
+  color: #222;
+  padding: 0.2em 0.7em;
+  border-radius: 16px;
   display: flex;
-  gap: 0.5em;
+  align-items: center;
+  font-size: 0.9em;
+  margin-right: 0.2em;
 }
-.heart {
+.tag button {
+  background: none;
+  color: #c0392b;
+  border: none;
+  margin-left: 0.4em;
   cursor: pointer;
-  font-size: 1.6em;
-  user-select: none;
-  transition: transform 0.15s, color 0.2s, background 0.2s;
-  border-radius: 50%;
-  padding: 0.1em 0.2em;
-  border: 2px solid transparent;
-  outline: none;
-  background: transparent;
-}
-.heart[aria-selected="true"] {
-  color: #e74c3c;
-  background: #fce4ec;
-  border-color: #e74c3c;
-  transform: scale(1.2);
-}
-.heart:focus {
-  border-color: #2980b9;
-  background: #d6eaff;
+  font-size: 1em;
+  padding: 0;
 }
 
-/* ==== Emotion Wheel ==== */
-#emotion-wheel {
-  margin-top: 1em;
-  display: inline-block;
-  background: #f8fafc;
-  box-shadow: 0 1px 8px #0001;
-  border-radius: 50%;
-}
-#emotion-wheel text {
-  pointer-events: none;
-  font-weight: 500;
-  text-shadow: 0 1px 2px #fff8;
-}
-#selected-emotion {
-  font-weight: bold;
-  font-size: 1.2em;
-  min-width: 90px;
-  display: inline-block;
-}
-
-/* ==== Entries List ==== */
-#emotionList {
+#entriesList {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-#emotionList li {
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px #0001;
-  margin-bottom: 0.4em;
-  padding: 0.7em;
-  display: flex;
-  align-items: center;
-  gap: 0.7em;
-  font-size: 1.07em;
-}
-#emotionList li b {
-  margin-right: 0.4em;
-}
-#emotionList li em {
-  color: #555;
-  font-style: italic;
-}
-#emotionList li small {
-  color: #888;
-}
-#emotionList li:last-child {
-  margin-bottom: 0;
-}
-
-/* ==== Chart ==== */
-#emotionTrendChart {
-  width: 100% !important;
-  max-width: 800px;
-  height: 280px !important;
-  margin: 0 auto 1em;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px #0001;
-  display: block;
-}
-
-/* ==== Import Preview ==== */
-#importPreviewContainer {
-  margin-top: 0.7em;
-}
-.import-preview {
-  background: #f8f9fa;
-  border: 1px solid #ccc;
+.entry {
+  background: var(--secondary);
+  border-radius: var(--border-radius);
+  margin-bottom: 1em;
   padding: 1em;
-  border-radius: 5px;
-  margin-top: 1em;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: relative;
 }
-.import-preview h3 {
-  margin-top: 0;
+body.dark .entry {
+  background: #23272c;
 }
-
-/* ==== Miscellaneous ==== */
-input[type="file"] {
-  display: inline-block;
-}
-input[type="file"]:focus {
-  outline: 2px solid #007bff;
-}
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  opacity: 0.7;
+.entry .removeEntryBtn {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+  background: none;
+  border: none;
+  color: var(--error);
+  cursor: pointer;
 }
 
-/* ==== Themes ==== */
-body.theme-blue { background: #e3eafd; }
-body.theme-green { background: #eafde7; }
-body.theme-yellow { background: #fffde7; }
-body.theme-pink { background: #fde7f9; }
-body.theme-gray { background: #f4f4f4; }
-body.theme-blue header,
-body.theme-green header,
-body.theme-yellow header,
-body.theme-pink header,
-body.theme-gray header {
-  color: #222;
+#toast {
+  position: fixed;
+  bottom: 1em;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #fff;
+  padding: 0.8em 1.6em;
+  border-radius: var(--border-radius);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
 }
-body.theme-blue section,
-body.theme-green section,
-body.theme-yellow section,
-body.theme-pink section,
-body.theme-gray section {
-  background: #fff;
+#toast.show {
+  opacity: 1;
+  pointer-events: auto;
 }
 
-/* ==== Dark Mode ==== */
-body.dark-mode {
-  background: #23272f;
-  color: #eaf6ff;
-}
-body.dark-mode header {
-  background: #23272f;
-  color: #eaf6ff;
-}
-body.dark-mode section {
-  background: #2d3542;
-  color: #eaf6ff;
-}
-body.dark-mode #emotionList li {
-  background: #333;
-  color: #fff;
-}
-body.dark-mode .tag {
-  background: #333;
-  color: #fff;
-}
-body.dark-mode .heart {
-  background: #23272f;
-  color: #eaf6ff;
-}
-body.dark-mode .heart[aria-selected="true"] {
-  background: #e74c3c;
-  color: #fff;
-}
-body.dark-mode #toast {
-  background: #34495e;
-  color: #fff;
+footer {
+  text-align: center;
+  margin-top: 2em;
+  padding: 1em 0;
+  color: #777;
+  background: none;
 }
 
-/* ==== Responsive ==== */
-@media (max-width: 700px) {
-  .controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5em;
-  }
-  #emotion-wheel {
-    width: 98vw;
-    height: 98vw;
-    max-width: 300px;
-    max-height: 300px;
+@media (max-width: 600px) {
+  main {
+    padding: 0.5em;
   }
 }
 
-@media (max-width: 480px) {
-  section {
-    padding: 0.6em;
-  }
-  #emotionTrendChart {
-    height: 180px !important;
-  }
+[aria-invalid="true"] {
+  border-color: var(--error);
+  background: #fff6f6;
 }
