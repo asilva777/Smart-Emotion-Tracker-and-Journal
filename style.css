@@ -1,52 +1,71 @@
+/* Font setup */
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Montserrat', 'Oswald', 'Roboto Condensed', sans-serif;
   margin: 0;
   padding: 0;
-  background: #f4f7fb;
-  color: #333;
+  background-color: #f4f7fb;
+  color: #000; /* Always black text */
 }
 
 header {
-  background: #5c6bc0;
-  color: white;
-  padding: 2rem;
+  background-color: #ffffff;
+  color: #000;
   text-align: center;
+  padding: 2rem;
+  border-bottom: 2px solid #ccc;
+}
+
+header h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 1rem;
 }
 
 main {
   padding: 2rem;
 }
 
-section {
-  background: white;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
+/* Quadrant Layout */
+.quadrants {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.quadrant {
+  padding: 1rem;
   border-radius: 8px;
+  color: #000;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-label {
-  display: block;
-  margin: 1rem 0 0.3rem;
+.quadrant.red {
+  background-color: #e53935; /* Red quadrant */
 }
 
-select, textarea, button {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+.quadrant.yellow {
+  background-color: #fdd835; /* Yellow quadrant */
 }
 
-button {
-  background: #5c6bc0;
-  color: white;
-  border: none;
-  cursor: pointer;
+.quadrant.blue {
+  background-color: #1e88e5; /* Blue quadrant */
+  color: #fff; /* contrast */
 }
 
-button:hover {
-  background: #3f51b5;
+.quadrant.green {
+  background-color: #43a047; /* Green quadrant */
+  color: #fff; /* contrast */
+}
+
+.quadrant h3 {
+  font-family: 'Oswald', sans-serif;
+  margin-bottom: 0.5rem;
 }
 
 ul {
@@ -54,9 +73,80 @@ ul {
   padding-left: 0;
 }
 
-li {
+ul li {
+  margin-bottom: 0.3rem;
+}
+
+/* Journal Form Styles */
+section.journal-form {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+label {
+  display: block;
+  margin: 1rem 0 0.3rem;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+input, select, textarea, button {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: 'Montserrat', sans-serif;
+  margin-bottom: 1rem;
+}
+
+button {
+  background-color: #fdd835; /* golden yellow */
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #fbc02d; /* deeper yellow */
+}
+
+/* Journal Log */
+.journal-log {
+  margin-top: 3rem;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.journal-log ul {
+  padding-left: 0;
+}
+
+.journal-log li {
   background: #e8eaf6;
-  margin: 0.5rem 0;
+  margin: 1rem 0;
   padding: 1rem;
   border-left: 4px solid #5c6bc0;
+}
+
+/* Mood Chart Section */
+.mood-chart {
+  margin-top: 3rem;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+footer {
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 2rem;
+  background-color: #ffffff;
+  color: #000;
 }
