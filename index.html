@@ -3,56 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SMART EMOTION TRACKER AND JOURNAL</title>
+  <title>Smart Emotion Tracker and Journal</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Montserrat:wght@400;600&family=Roboto+Condensed&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
-    <h1>🧠 SMART EMOTION TRACKER AND JOURNAL</h1>
-    <p>Select your emotion and reflect on your day</p>
+    <h1>🧠 Smart Emotion Tracker and Journal</h1>
+    <p>Reflect deeply on your mood, triggers, and growth</p>
   </header>
 
   <main>
+    <section class="mood-grid">
+      <h2>🔍 Select Your Mood from the Four Quadrants</h2>
+      <div class="quadrants">
+        <div class="quadrant red">
+          <h3>🔴 Red: High Energy / Low Pleasantness</h3>
+          <ul id="red-emotions"></ul>
+        </div>
+        <div class="quadrant yellow">
+          <h3>🟡 Yellow: High Energy / High Pleasantness</h3>
+          <ul id="yellow-emotions"></ul>
+        </div>
+        <div class="quadrant blue">
+          <h3>🔵 Blue: Low Energy / Low Pleasantness</h3>
+          <ul id="blue-emotions"></ul>
+        </div>
+        <div class="quadrant green">
+          <h3>🟢 Green: Low Energy / High Pleasantness</h3>
+          <ul id="green-emotions"></ul>
+        </div>
+      </div>
+    </section>
+
     <section class="journal-form">
-      <h2>✨ Log Today's Emotion</h2>
+      <h2>📝 Log Your Emotion</h2>
       <form id="moodForm">
-        <label for="quadrant">Mood Quadrant:</label>
-        <select id="quadrant" required>
-          <option value="">--Select--</option>
-          <option value="red">Red – High Energy, Low Pleasantness</option>
-          <option value="yellow">Yellow – High Energy, High Pleasantness</option>
-          <option value="blue">Blue – Low Energy, Low Pleasantness</option>
-          <option value="green">Green – Low Energy, High Pleasantness</option>
+        <label for="quadrant">Quadrant:</label>
+        <select id="quadrant">
+          <option value="">--Select Quadrant--</option>
+          <option value="red">Red</option>
+          <option value="yellow">Yellow</option>
+          <option value="blue">Blue</option>
+          <option value="green">Green</option>
         </select>
 
         <label for="emotion">Emotion:</label>
-        <select id="emotion" required>
-          <option value="">--Choose Quadrant First--</option>
+        <select id="emotion">
+          <option value="">--Select Emotion--</option>
         </select>
 
         <label for="intensity">Intensity:</label>
-        <select id="intensity" required>
+        <select id="intensity">
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
 
-        <label for="note">Reflection Note:</label>
-        <textarea id="note" placeholder="Why do you feel this way?" rows="3"></textarea>
+        <label for="tag">What are you doing?</label>
+        <select id="tag">
+          <option value="work">🧠 work</option>
+          <option value="study">🏫 study</option>
+          <option value="eating">🍽️ eating</option>
+          <option value="resting">🛋️ resting</option>
+          <option value="exercise">🚶 exercising</option>
+          <option value="social">💬 socializing</option>
+          <option value="media">🌐 browsing</option>
+          <option value="meditate">🧘 meditating</option>
+          <option value="journal">✍️ journaling</option>
+          <option value="game">🎮 gaming</option>
+          <option value="music">🎧 listening</option>
+          <option value="tv">📺 watching</option>
+        </select>
+
+        <label for="context">Context:</label>
+        <input type="text" id="context" placeholder="e.g., working late, alone at home" />
+
+        <label for="trigger">Trigger:</label>
+        <input type="text" id="trigger" placeholder="e.g., missed deadline, kind message" />
+
+        <label for="note">Reflection:</label>
+        <textarea id="note" placeholder="e.g., I felt drained but grateful after dinner with my sister." rows="3"></textarea>
 
         <button type="submit">Log Emotion</button>
       </form>
     </section>
 
     <section class="journal-log">
-      <h2>📖 Journal Log</h2>
+      <h2>📖 Mood Journal Log</h2>
       <ul id="logList"></ul>
+    </section>
+
+    <section class="mood-chart">
+      <h2>📊 One-Month Mood Chart</h2>
+      <canvas id="moodChart"></canvas>
     </section>
   </main>
 
-
-  </footer>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
