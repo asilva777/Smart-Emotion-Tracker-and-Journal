@@ -1,13 +1,13 @@
 {
-  "name": "Emotional Wellness Tracker",
-  "short_name": "WellnessTracker",
-  "description": "A web app to track your emotions, activities, and well-being.",
-  "start_url": ".",
+  "name": "SMART Emotion Tracker and Journal",
+  "short_name": "MoodTracker",
+  "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f5f5f5",
-  "theme_color": "#4a90e2",
-  "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  "background_color": "#ffffff",
+  "theme_color": "#c80ec9",
+  "icons":[
+    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png"}
   ]
 }
