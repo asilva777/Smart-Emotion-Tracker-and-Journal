@@ -1,198 +1,62 @@
-:root {
-  --primary: #4a90e2;
-  --secondary: #f5f5f5;
-  --text: #222;
-  --accent: #ffd700;
-  --error: #c0392b;
-  --success: #27ae60;
-  --dark-bg: #181c20;
-  --dark-text: #f5f5f5;
-  --header-height: 64px;
-  --border-radius: 8px;
-  --transition: 0.2s;
-}
-
-html, body {
+body {
+  font-family: 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
-  font-family: system-ui, sans-serif;
-  background: var(--secondary);
-  color: var(--text);
-}
-
-body.dark {
-  background: var(--dark-bg);
-  color: var(--dark-text);
+  background: #f4f7fb;
+  color: #333;
 }
 
 header {
-  background: var(--primary);
-  color: #fff;
-  padding: 1em;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  min-height: var(--header-height);
-}
-
-header h1 {
-  margin: 0 0 0.5em 0;
-}
-
-nav {
-  display: flex;
-  gap: 1em;
-  align-items: center;
-}
-
-#themeToggle {
-  background: none;
-  border: none;
-  font-size: 1.5em;
-  color: inherit;
-  cursor: pointer;
-  outline: 2px solid transparent;
-  transition: outline var(--transition);
-}
-#themeToggle:focus {
-  outline: 2px solid var(--accent);
+  background: #5c6bc0;
+  color: white;
+  padding: 2rem;
+  text-align: center;
 }
 
 main {
-  max-width: 720px;
-  margin: 2em auto;
-  padding: 1em;
-  background: #fff;
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-}
-body.dark main {
-  background: #23272c;
+  padding: 2rem;
 }
 
-form section {
-  margin-bottom: 1.2em;
+section {
+  background: white;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 label {
   display: block;
-  font-weight: 600;
-  margin-bottom: 0.4em;
+  margin: 1rem 0 0.3rem;
 }
 
-input, select, textarea, button {
-  font-size: 1em;
-  border-radius: var(--border-radius);
-  border: 1px solid #b0b0b0;
-  padding: 0.5em;
-  margin-bottom: 0.5em;
+select, textarea, button {
   width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-input:focus, select:focus, textarea:focus {
-  outline: 2px solid var(--primary);
-}
-button, [type="submit"] {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  padding: 0.7em 1.4em;
-  font-weight: 600;
-  margin: 0.3em 0;
-  transition: background var(--transition);
-}
-button:hover, button:focus {
-  background: #3567a6;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
-#activityTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3em;
-  margin-bottom: 0.5em;
-}
-.tag {
-  background: var(--accent);
-  color: #222;
-  padding: 0.2em 0.7em;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  font-size: 0.9em;
-  margin-right: 0.2em;
-}
-.tag button {
-  background: none;
-  color: #c0392b;
+button {
+  background: #5c6bc0;
+  color: white;
   border: none;
-  margin-left: 0.4em;
   cursor: pointer;
-  font-size: 1em;
-  padding: 0;
 }
 
-#entriesList {
+button:hover {
+  background: #3f51b5;
+}
+
+ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.entry {
-  background: var(--secondary);
-  border-radius: var(--border-radius);
-  margin-bottom: 1em;
-  padding: 1em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  position: relative;
-}
-body.dark .entry {
-  background: #23272c;
-}
-.entry .removeEntryBtn {
-  position: absolute;
-  right: 1em;
-  top: 1em;
-  background: none;
-  border: none;
-  color: var(--error);
-  cursor: pointer;
+  padding-left: 0;
 }
 
-#toast {
-  position: fixed;
-  bottom: 1em;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--primary);
-  color: #fff;
-  padding: 0.8em 1.6em;
-  border-radius: var(--border-radius);
-  z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition);
-}
-#toast.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-footer {
-  text-align: center;
-  margin-top: 2em;
-  padding: 1em 0;
-  color: #777;
-  background: none;
-}
-
-@media (max-width: 600px) {
-  main {
-    padding: 0.5em;
-  }
-}
-
-[aria-invalid="true"] {
-  border-color: var(--error);
-  background: #fff6f6;
+li {
+  background: #e8eaf6;
+  margin: 0.5rem 0;
+  padding: 1rem;
+  border-left: 4px solid #5c6bc0;
 }
