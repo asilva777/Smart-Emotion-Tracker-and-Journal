@@ -1,13 +1,23 @@
 {
   "name": "SMART Emotion Tracker and Journal",
-  "short_name": "MoodTracker",
+  "short_name": "SMART_Emotion_Tracker",
+  "description": "Log daily emotions using the 4-quadrant Mood Meter, reflect, and visualize trends.",
   "start_url": "/index.html",
-  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#c80ec9",
-  "icons":[
-    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"},
-    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png"}
+  "theme_color": "#fdd835",
+  "orientation": "portrait",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
