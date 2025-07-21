@@ -1,145 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SMART Emotion Tracker and Journal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#c80ec9">
-  <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Montserrat&family=Roboto+Condensed&display=swap" rel="stylesheet">
-  <style>
-    body { margin:0; font-family:'Roboto Condensed',sans-serif; background:#fff; color:#000; display:flex;flex-direction:column; min-height:100vh; }
-    header, footer { background:#f3e329; color:#000; text-align:center; padding:1rem; font-family:'Oswald',sans-serif; }
-    main { flex:1; padding:1rem; }
-    .quads { display:grid; grid-template-columns: repeat(2,1fr); gap:1rem; }
-    .quad { border:2px solid; border-radius:8px; padding:0.5rem; }
-    .quad.red { border-color:#c80e0e; }
-    .quad.yellow { border-color:#c8a30e; }
-    .quad.blue { border-color:#0e3bc8; }
-    .quad.green { border-color:#0eC84e; }
-    .quad h3 { margin:0; text-align:center; font-family:'Montserrat',sans-serif; }
-    .emotion-btn { margin:3px; padding:5px 8px; border:none; cursor:pointer; border-radius:4px; background:#f3e329; color:#000; }
-    .section { margin-bottom:2rem; }
-    select, textarea, input[type=email] { width:100%; padding:0.5rem; margin-top:0.5rem; }
-    button { background:#f3e329; color:#000; padding:0.75rem 1.5rem; border:none; cursor:pointer; margin-top:0.5rem; }
-    #log { max-height:200px; overflow:auto; border:1px solid #ccc; padding:0.5rem; }
-    .entry { border-bottom:1px solid #ddd; padding:0.25rem 0; }
-    canvas { width:100%!important; height:200px!important; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SMART EMOTION TRACKER AND JOURNAL</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header>
+    <h1>🧠 SMART EMOTION TRACKER AND JOURNAL</h1>
+    <p>Select your emotion and reflect on your day</p>
+  </header>
 
-<header>
-  <h1>SMART EMOTION TRACKER AND JOURNAL</h1>
-</header>
+  <main>
+    <section class="journal-form">
+      <h2>✨ Log Today's Emotion</h2>
+      <form id="moodForm">
+        <label for="quadrant">Mood Quadrant:</label>
+        <select id="quadrant" required>
+          <option value="">--Select--</option>
+          <option value="red">Red – High Energy, Low Pleasantness</option>
+          <option value="yellow">Yellow – High Energy, High Pleasantness</option>
+          <option value="blue">Blue – Low Energy, Low Pleasantness</option>
+          <option value="green">Green – Low Energy, High Pleasantness</option>
+        </select>
 
-<main>
-  <section class="section">
-    <h2>🔲 Mood Meter – Select Emotion</h2>
-    <div class="quads">
-      <div class="quad red" data-quadrant="Red"><h3>Red (High Energy, Low Pleasantness)</h3></div>
-      <div class="quad yellow" data-quadrant="Yellow"><h3>Yellow (High Energy, High Pleasantness)</h3></div>
-      <div class="quad blue" data-quadrant="Blue"><h3>Blue (Low Energy, Low Pleasantness)</h3></div>
-      <div class="quad green" data-quadrant="Green"><h3>Green (Low Energy, High Pleasantness)</h3></div>
-    </div>
-    <select id="intensity"><option value="">Select intensity</option><option>Low</option><option>Medium</option><option>High</option></select>
-    <textarea id="notes" placeholder="Optional journal note..."></textarea>
-    <label><input type="checkbox" id="optIn"> Opt in to anonymous research</label>
-    <button id="saveBtn">Save Entry</button>
-  </section>
+        <label for="emotion">Emotion:</label>
+        <select id="emotion" required>
+          <option value="">--Choose Quadrant First--</option>
+        </select>
 
-  <section class="section">
-    <h2>📋 Journal Log</h2>
-    <div id="log"></div>
-  </section>
+        <label for="intensity">Intensity:</label>
+        <select id="intensity" required>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
 
-  <section class="section">
-    <h2>📊 Mood Patterns</h2>
-    <canvas id="chart"></canvas>
-  </section>
-</main>
+        <label for="note">Reflection Note:</label>
+        <textarea id="note" placeholder="Why do you feel this way?" rows="3"></textarea>
 
-<footer>
-  <p>All data saved locally or synced when online with opt-in.</p>
-</footer>
+        <button type="submit">Log Emotion</button>
+      </form>
+    </section>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const mood = {
-    Red: ["Enraged","Furious","Panicked","Stressed","Jittery","Irritated","Annoyed","Tense","Worried","Apprehensive","Fuming","Frightened","Shocked","Stunned","Nervous"],
-    Yellow: ["Exhilarated","Ecstatic","Upbeat","Cheerful","Inspired","Motivated","Elated","Thrilled","Proud","Happy","Lively","Playful","Hopeful","Optimistic","Enthusiastic"],
-    Blue: ["Depressed","Miserable","Lonely","Disheartened","Alienated","Tired","Fatigued","Sullen","Despondent","Hopeless","Down","Glum","Discouraged","Bored","Spent"],
-    Green: ["Relaxed","Chill","Restful","Serene","Tranquil","Content","Fulfilled","Loving","Grateful","Touched","Comfortable","Balanced","Mellow","Thoughtful","Peaceful"]
-  };
+    <section class="journal-log">
+      <h2>📖 Journal Log</h2>
+      <ul id="logList"></ul>
+    </section>
+  </main>
 
-  const entries = JSON.parse(localStorage.getItem('entries')||'[]');
 
-  function populate() {
-    document.querySelectorAll('.quad').forEach(q=>{
-      const quad=q.dataset.quadrant;
-      mood[quad].forEach(em=>{
-        const btn=document.createElement('button');
-        btn.textContent=em;
-        btn.className='emotion-btn';
-        btn.onclick=()=>selectEmotion(quad,em);
-        q.appendChild(btn);
-      });
-    });
-  }
+  </footer>
 
-  let selected;
-  function selectEmotion(quad,emotion){
-    selected={quad,emotion};
-    document.querySelectorAll('.quad').forEach(q=>q.style.opacity=1);
-    event.target.closest('.quad').style.opacity=0.6;
-  }
-
-  function renderLog(){
-    const log=document.getElementById('log');
-    log.innerHTML='';
-    entries.slice().reverse().forEach(e=>{
-      const d=new Date(e.date).toLocaleString();
-      const div=document.createElement('div');
-      div.className='entry';
-      div.innerHTML=`<strong>${d}</strong>: [${e.quad}|${e.intensity}] ${e.emotion}<br>${e.notes||''}`;
-      log.appendChild(div);
-    });
-  }
-
-  const ctx=document.getElementById('chart').getContext('2d');
-  const chart=new Chart(ctx,{
-    type:'line',
-    data:{labels:[],datasets:[{label:'Entries',borderColor:'#c80ec9',data:[],fill:false}]},
-    options:{scales:{x:{type:'time',time:{unit:'day'}}}}
-  });
-
-  function refreshChart(){
-    chart.data.labels=entries.map(e=>e.date);
-    chart.data.datasets[0].data=entries.map((_,i)=>i+1);
-    chart.update();
-  }
-
-  document.getElementById('saveBtn').onclick=async ()=>{
-    if(!selected){alert('Pick an emotion');return;}
-    const intensity=document.getElementById('intensity').value;
-    if(!intensity){alert('Pick intensity');return;}
-    const notes=document.getElementById('notes').value;
-    const optIn=!!document.getElementById('optIn').checked;
-    const e={...selected,intensity,notes,date:new Date().toISOString(),optIn};
-    entries.push(e);
-    localStorage.setItem('entries',JSON.stringify(entries));
-    renderLog(); refreshChart();
-    if(optIn && navigator.onLine){
-      await fetch('/api/research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(e)});
-    }
-    alert('Saved!');
-  };
-
-  window.addEventListener('load',()=>{
-    populate(); renderLog(); refreshChart();
-  });
-
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
