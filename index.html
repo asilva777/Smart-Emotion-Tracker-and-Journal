@@ -2,163 +2,144 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>SMART Emotion Tracker and Journal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Track your daily emotions and activities to improve self-awareness and well-being.">
   <meta name="theme-color" content="#c80ec9">
-  <meta name="keywords" content="emotional wellness, tracker, mood, self-awareness, mental health">
-  <meta name="author" content="asilva777">
-  <title>SMART Emotional Wellness Tracker</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="icons/icon-192.png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Oswald&family=Roboto+Condensed&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald&family=Montserrat&family=Roboto+Condensed&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Roboto Condensed', sans-serif; background: #fff; color: #000; margin:0; padding:0; display:flex; flex-direction:column; min-height:100vh; }
+    body { margin:0; font-family:'Roboto Condensed',sans-serif; background:#fff; color:#000; display:flex;flex-direction:column; min-height:100vh; }
     header, footer { background:#f3e329; color:#000; text-align:center; padding:1rem; font-family:'Oswald',sans-serif; }
     main { flex:1; padding:1rem; }
-    button { background:#f3e329; color:#000; border:none; padding:0.75rem 1.5rem; margin:0.5rem 0; font-weight:bold; cursor:pointer; }
-    button:hover { opacity:0.9; }
-    select, textarea, input[type="email"] { width:100%; padding:0.5rem; margin:0.5rem 0; font-size:1rem; }
+    .quads { display:grid; grid-template-columns: repeat(2,1fr); gap:1rem; }
+    .quad { border:2px solid; border-radius:8px; padding:0.5rem; }
+    .quad.red { border-color:#c80e0e; }
+    .quad.yellow { border-color:#c8a30e; }
+    .quad.blue { border-color:#0e3bc8; }
+    .quad.green { border-color:#0eC84e; }
+    .quad h3 { margin:0; text-align:center; font-family:'Montserrat',sans-serif; }
+    .emotion-btn { margin:3px; padding:5px 8px; border:none; cursor:pointer; border-radius:4px; background:#f3e329; color:#000; }
     .section { margin-bottom:2rem; }
-    #emotionChart { width:100%; height:400px; }
+    select, textarea, input[type=email] { width:100%; padding:0.5rem; margin-top:0.5rem; }
+    button { background:#f3e329; color:#000; padding:0.75rem 1.5rem; border:none; cursor:pointer; margin-top:0.5rem; }
+    #log { max-height:200px; overflow:auto; border:1px solid #ccc; padding:0.5rem; }
+    .entry { border-bottom:1px solid #ddd; padding:0.25rem 0; }
+    canvas { width:100%!important; height:200px!important; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
 </head>
-
 <body>
-  <header>
-    <h1>Smart Emotion Tracker and Journal</h1>
-    <nav aria-label="Main navigation">
-      <button id="themeToggle" aria-pressed="false" aria-label="Toggle dark/light mode"></button>
-      </select>
-    </nav>
-  </header>
-  <body>
-  <main>
-    <form id="entryForm" aria-labelledby="entryFormTitle">
-      <h2 id="entryFormTitle">Log Today’s Emotion</h2>
-      <section>
-        <label for="emotionSelect">Emotion</label>
-        <select id="emotionSelect" required aria-required="true"></select>
-    <option value="">-- Select Emotion --</option></select>
-    <input type="text" id="factors" placeholder="Contributing factors">
-    <textarea id="notes" rows="3" placeholder="Journal your thoughts..."></textarea>
-    <label><input type="checkbox" id="optInResearch"> I consent to anonymous research data contribution</label><br>
-    <button onclick="logEmotion()">Save Emotion</button>
+
+<header>
+  <h1>SMART EMOTION TRACKER AND JOURNAL</h1>
+</header>
+
+<main>
+  <section class="section">
+    <h2>🔲 Mood Meter – Select Emotion</h2>
+    <div class="quads">
+      <div class="quad red" data-quadrant="Red"><h3>Red (High Energy, Low Pleasantness)</h3></div>
+      <div class="quad yellow" data-quadrant="Yellow"><h3>Yellow (High Energy, High Pleasantness)</h3></div>
+      <div class="quad blue" data-quadrant="Blue"><h3>Blue (Low Energy, Low Pleasantness)</h3></div>
+      <div class="quad green" data-quadrant="Green"><h3>Green (Low Energy, High Pleasantness)</h3></div>
+    </div>
+    <select id="intensity"><option value="">Select intensity</option><option>Low</option><option>Medium</option><option>High</option></select>
+    <textarea id="notes" placeholder="Optional journal note..."></textarea>
+    <label><input type="checkbox" id="optIn"> Opt in to anonymous research</label>
+    <button id="saveBtn">Save Entry</button>
   </section>
 
   <section class="section">
-    <h2>📊 Emotional Trends</h2>
-    <canvas id="emotionChart"></canvas>
+    <h2>📋 Journal Log</h2>
+    <div id="log"></div>
   </section>
 
   <section class="section">
-    <h2>👥 Share with Friend</h2>
-    <input type="email" id="friendEmail" placeholder="Friend's email">
-    <button onclick="shareEntry()">Share Latest Entry</button>
-    <p id="shareStatus"></p>
+    <h2>📊 Mood Patterns</h2>
+    <canvas id="chart"></canvas>
   </section>
 </main>
 
 <footer>
-  <p>Data stored locally. Optional anonymous research & optional email sharing.</p>
+  <p>All data saved locally or synced when online with opt-in.</p>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  emailjs.init('YOUR_EMAILJS_USER_ID');
+  const mood = {
+    Red: ["Enraged","Furious","Panicked","Stressed","Jittery","Irritated","Annoyed","Tense","Worried","Apprehensive","Fuming","Frightened","Shocked","Stunned","Nervous"],
+    Yellow: ["Exhilarated","Ecstatic","Upbeat","Cheerful","Inspired","Motivated","Elated","Thrilled","Proud","Happy","Lively","Playful","Hopeful","Optimistic","Enthusiastic"],
+    Blue: ["Depressed","Miserable","Lonely","Disheartened","Alienated","Tired","Fatigued","Sullen","Despondent","Hopeless","Down","Glum","Discouraged","Bored","Spent"],
+    Green: ["Relaxed","Chill","Restful","Serene","Tranquil","Content","Fulfilled","Loving","Grateful","Touched","Comfortable","Balanced","Mellow","Thoughtful","Peaceful"]
+  };
 
-  const moodWords = [ /* 144-word list here */ ];
-  const emotionSelect = document.getElementById('emotionSelect');
-  moodWords.forEach(w => { let o = document.createElement('option'); o.value=w; o.text=w; emotionSelect.appendChild(o); });
+  const entries = JSON.parse(localStorage.getItem('entries')||'[]');
 
-  let entries = JSON.parse(localStorage.getItem('entries') || '[]');
-  const ctx = document.getElementById('emotionChart').getContext('2d');
-  const chart = new Chart(ctx, { type:'line', data:{labels:[],datasets:[{label:'Mood entries',data:[],borderColor:'#c80ec9',tension:0.3}]}});
-
-  function logEmotion(){
-    const emotion=emotionSelect.value;
-    if(!emotion) return alert('Select emotion');
-    const entry={date:new Date().toISOString(),emotion,factors:document.getElementById('factors').value,notes:document.getElementById('notes').value,optIn:document.getElementById('optInResearch').checked};
-    entries.push(entry); localStorage.setItem('entries',JSON.stringify(entries));
-    syncResearch(entry); renderChart(); alert('Saved');
+  function populate() {
+    document.querySelectorAll('.quad').forEach(q=>{
+      const quad=q.dataset.quadrant;
+      mood[quad].forEach(em=>{
+        const btn=document.createElement('button');
+        btn.textContent=em;
+        btn.className='emotion-btn';
+        btn.onclick=()=>selectEmotion(quad,em);
+        q.appendChild(btn);
+      });
+    });
   }
 
-  function renderChart(){
+  let selected;
+  function selectEmotion(quad,emotion){
+    selected={quad,emotion};
+    document.querySelectorAll('.quad').forEach(q=>q.style.opacity=1);
+    event.target.closest('.quad').style.opacity=0.6;
+  }
+
+  function renderLog(){
+    const log=document.getElementById('log');
+    log.innerHTML='';
+    entries.slice().reverse().forEach(e=>{
+      const d=new Date(e.date).toLocaleString();
+      const div=document.createElement('div');
+      div.className='entry';
+      div.innerHTML=`<strong>${d}</strong>: [${e.quad}|${e.intensity}] ${e.emotion}<br>${e.notes||''}`;
+      log.appendChild(div);
+    });
+  }
+
+  const ctx=document.getElementById('chart').getContext('2d');
+  const chart=new Chart(ctx,{
+    type:'line',
+    data:{labels:[],datasets:[{label:'Entries',borderColor:'#c80ec9',data:[],fill:false}]},
+    options:{scales:{x:{type:'time',time:{unit:'day'}}}}
+  });
+
+  function refreshChart(){
     chart.data.labels=entries.map(e=>e.date);
     chart.data.datasets[0].data=entries.map((_,i)=>i+1);
     chart.update();
   }
 
-  function shareEntry(){
-    if(!entries.length) return alert('Add an entry first');
-    const last=entries[entries.length-1];
-    emailjs.send('YOUR_SERVICE_ID','YOUR_TEMPLATE_ID',{
-      to_email:document.getElementById('friendEmail').value,
-      emotion:last.emotion, notes:last.notes
-    })
-    .then(res=> document.getElementById('shareStatus').innerText='Shared!')
-    .catch(err=> document.getElementById('shareStatus').innerText='Failed');
-  }
-
-  function syncResearch(entry){
-    if(entry.optIn) {
-      fetch('https://your-backend-or-firestore-endpoint', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entry)
-      });
+  document.getElementById('saveBtn').onclick=async ()=>{
+    if(!selected){alert('Pick an emotion');return;}
+    const intensity=document.getElementById('intensity').value;
+    if(!intensity){alert('Pick intensity');return;}
+    const notes=document.getElementById('notes').value;
+    const optIn=!!document.getElementById('optIn').checked;
+    const e={...selected,intensity,notes,date:new Date().toISOString(),optIn};
+    entries.push(e);
+    localStorage.setItem('entries',JSON.stringify(entries));
+    renderLog(); refreshChart();
+    if(optIn && navigator.onLine){
+      await fetch('/api/research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(e)});
     }
-  }
+    alert('Saved!');
+  };
 
-  renderChart();
+  window.addEventListener('load',()=>{
+    populate(); renderLog(); refreshChart();
+  });
+
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
 </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-  }
-</script>
-</body>
-</html>
-
-        <button type="button" id="addEmotionBtn" aria-label="Add custom emotion">+</button>
-      </section>
-      <section>
-        <label for="noteInput">Notes</label>
-        <textarea id="noteInput" rows="2" maxlength="250" aria-describedby="noteHelp"></textarea>
-        <small id="noteHelp">Max 250 characters.</small>
-      </section>
-      <section>
-        <label for="activityTags">Activity Tags</label>
-        <div id="activityTags" role="list"></div>
-        <input type="text" id="tagInput" maxlength="20" aria-label="New activity tag">
-        <button type="button" id="addTagBtn" aria-label="Add activity tag">+</button>
-      </section>
-      <section>
-        <label for="bpInput">Blood Pressure <span aria-hidden="true">(Optional)</span></label>
-        <input id="bpInput" name="bp" type="text" pattern="^(\d{2,3})\/(\d{2,3})$" maxlength="7" aria-describedby="bpHelp">
-        <small id="bpHelp">Format: 120/80</small>
-      </section>
-      <button type="submit">Save Entry</button>
-    </form>
-
-    <section id="entriesSection" aria-labelledby="entriesTitle">
-      <h2 id="entriesTitle">Entries</h2>
-      <ul id="entriesList" role="list"></ul>
-    </section>
-
-    <section id="statsSection" aria-labelledby="statsTitle">
-      <h2 id="statsTitle">Emotion Chart</h2>
-      <canvas id="emotionChart" width="400" height="200" aria-label="Emotion chart" role="img"></canvas>
-    </section>
-  </main>
-
-  <footer>
-    <button id="exportBtn">Export Data</button>
-    <button id="importBtn">Import Data</button>
-    <input type="file" id="importFile" accept=".json" hidden>
-  </footer>
-
-  <div id="toast" role="status" aria-live="polite"></div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js" defer></script>
 </body>
 </html>
